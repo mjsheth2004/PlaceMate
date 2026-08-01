@@ -1,0 +1,15 @@
+{% extends 'shared/base.html' %}
+
+{% block title %}Company Dashboard - Placement Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Welcome, {{ user.companyprofile.company_name|default:user.email }}</h1>
+    <p>This is your company dashboard. Here you can manage your company profile, announce recruitment drives, and review applicants.</p>
+</div>
+
+<div class="card" style="margin-top: calc(var(--space-unit) * 6);">
+    <h3>Recent Activity</h3>
+    <p>Your dashboard is currently under construction. Please check back later!</p>
+</div>
+{% endblock %}

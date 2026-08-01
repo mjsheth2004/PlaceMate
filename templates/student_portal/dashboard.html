@@ -1,0 +1,16 @@
+{% extends 'shared/base.html' %}
+
+{% block title %}Student Dashboard - Placement Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Welcome, {{ user.studentprofile.full_name|default:user.email }}</h1>
+    <p>This is your student dashboard. Here you can view open placement drives, manage your profile, and track
+        applications.</p>
+</div>
+
+<div class="card" style="margin-top: calc(var(--space-unit) * 6);">
+    <h3>Pending Actions</h3>
+    <p>Your dashboard is currently under construction. Please check back later!</p>
+</div>
+{% endblock %}

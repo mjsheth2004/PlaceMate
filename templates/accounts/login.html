@@ -80,9 +80,16 @@
         <form class="login-form" method="post" action="{% url 'accounts:login' %}">
             {% csrf_token %}
             
+            {% if form.errors %}
+                <div class="alert alert-error" style="color: red; margin-bottom: 1rem; text-align: center;">
+                    Please enter a correct email and password.
+                </div>
+            {% endif %}
+            
             <div class="input-group">
                 <label for="email" class="input-label">Email Address</label>
-                <input type="email" id="email" name="email" class="input-field" placeholder="Enter your email" required>
+                <!-- Django's built-in AuthenticationForm expects the credential field to be named 'username' even if USERNAME_FIELD is 'email' -->
+                <input type="email" id="email" name="username" class="input-field" placeholder="Enter your email" required>
             </div>
             
             <div class="input-group">
@@ -94,7 +101,7 @@
         </form>
         
         <div class="auth-links">
-            <a href="#" class="forgot-password">Forgot Password?</a>
+            <a href="{% url 'accounts:forgot_password' %}" class="forgot-password">Forgot Password?</a>
             <p class="register-prompt">Not a user? <a href="{% url 'accounts:register' %}" class="register-link">Register here</a></p>
         </div>
     </div>
