@@ -1,0 +1,158 @@
+{% extends 'shared/base.html' %}
+
+{% block title %}Student Registration - Placement Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        padding: calc(var(--space-unit) * 8) 0;
+        background-color: var(--color-background);
+    }
+    
+    .register-wrapper {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 calc(var(--space-unit) * 4);
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: calc(var(--space-unit) * 6);
+    }
+    
+    .register-header h1 {
+        font-size: 2rem;
+        margin-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 calc(var(--space-unit) * 6);
+    }
+    
+    .form-section-title {
+        grid-column: 1 / -1;
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        color: var(--color-primary);
+        margin-top: calc(var(--space-unit) * 4);
+        margin-bottom: calc(var(--space-unit) * 4);
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: calc(var(--space-unit) * 3);
+        font-size: 1rem;
+        margin-top: calc(var(--space-unit) * 4);
+    }
+    
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: calc(var(--space-unit) * 6);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        font-family: var(--font-body);
+    }
+    
+    .back-link:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 600px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="card">
+        <div class="register-header">
+            <h1>Student Registration</h1>
+            <p>Create your PlaceMate student profile</p>
+        </div>
+        
+        <form method="post" action="{% url 'accounts:register_student' %}">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <h3 class="form-section-title">Account Information</h3>
+                
+                <div class="input-group">
+                    <label for="email" class="input-label">Email Address *</label>
+                    <input type="email" id="email" name="email" class="input-field" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password" class="input-label">Password *</label>
+                    <input type="password" id="password" name="password" class="input-field" required>
+                </div>
+                
+                <h3 class="form-section-title">Academic Profile</h3>
+                
+                <div class="input-group">
+                    <label for="full_name" class="input-label">Full Name *</label>
+                    <input type="text" id="full_name" name="full_name" class="input-field" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="roll_number" class="input-label">Roll Number *</label>
+                    <input type="text" id="roll_number" name="roll_number" class="input-field data-figure" required>
+                </div>
+                
+                <div class="input-group full-width">
+                    <label for="university" class="input-label">University *</label>
+                    <input type="text" id="university" name="university" class="input-field" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="department" class="input-label">Department *</label>
+                    <select id="department" name="department" class="input-field" required>
+                        <option value="" disabled selected>Select your department</option>
+                        <option value="1">Computer Engineering</option>
+                        <option value="2">Information Technology</option>
+                        <option value="3">Mechanical Engineering</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="semester" class="input-label">Current Semester *</label>
+                    <input type="number" id="semester" name="semester" class="input-field" min="1" max="10" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="cgpa" class="input-label">CGPA (out of 10.00) *</label>
+                    <input type="number" id="cgpa" name="cgpa" class="input-field data-figure" step="0.01" min="0" max="10" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="passing_year" class="input-label">Passing Year *</label>
+                    <input type="number" id="passing_year" name="passing_year" class="input-field data-figure" min="2020" max="2030" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="active_backlogs" class="input-label">Active Backlogs</label>
+                    <input type="number" id="active_backlogs" name="active_backlogs" class="input-field data-figure" min="0" value="0">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-submit">Register as Student</button>
+        </form>
+        
+        <a href="{% url 'accounts:register' %}" class="back-link">&larr; Back to Role Selection</a>
+    </div>
+</div>
+{% endblock %}

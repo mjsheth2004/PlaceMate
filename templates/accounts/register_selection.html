@@ -1,0 +1,122 @@
+{% extends 'shared/base.html' %}
+
+{% block title %}Register - Placement Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: var(--color-background);
+    }
+    
+    .selection-wrapper {
+        width: 100%;
+        max-width: 600px;
+        padding: calc(var(--space-unit) * 4);
+    }
+    
+    .selection-header {
+        text-align: center;
+        margin-bottom: calc(var(--space-unit) * 8);
+    }
+    
+    .selection-header h1 {
+        font-size: 2rem;
+        margin-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .selection-header p {
+        color: var(--color-text-secondary);
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    .role-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: calc(var(--space-unit) * 6);
+    }
+    
+    .role-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        text-decoration: none;
+        padding: calc(var(--space-unit) * 8) calc(var(--space-unit) * 4);
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+    
+    .role-card:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .role-icon {
+        font-size: 3rem;
+        margin-bottom: calc(var(--space-unit) * 4);
+        color: var(--color-primary);
+    }
+    
+    .role-card h3 {
+        margin-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .role-card p {
+        color: var(--color-text-secondary);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: calc(var(--space-unit) * 8);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        font-family: var(--font-body);
+    }
+    
+    .back-link:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 600px) {
+        .role-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="selection-wrapper">
+    <div class="selection-header">
+        <h1>Create an Account</h1>
+        <p>How would you like to register on PlaceMate?</p>
+    </div>
+    
+    <div class="role-cards">
+        <a href="{% url 'accounts:register_student' %}" class="card role-card">
+            <div class="role-icon">🎓</div>
+            <h3>Student</h3>
+            <p>Apply for drives, track your application status, and view interview schedules.</p>
+        </a>
+        
+        <a href="{% url 'accounts:register_company' %}" class="card role-card">
+            <div class="role-icon">🏢</div>
+            <h3>Company</h3>
+            <p>Post placement drives, review applicants, and publish selection results.</p>
+        </a>
+    </div>
+    
+    <a href="{% url 'accounts:login' %}" class="back-link">&larr; Back to Login</a>
+</div>
+{% endblock %}

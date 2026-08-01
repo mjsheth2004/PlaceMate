@@ -1,0 +1,143 @@
+{% extends 'shared/base.html' %}
+
+{% block title %}Company Registration - Placement Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        padding: calc(var(--space-unit) * 8) 0;
+        background-color: var(--color-background);
+    }
+    
+    .register-wrapper {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 calc(var(--space-unit) * 4);
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: calc(var(--space-unit) * 6);
+    }
+    
+    .register-header h1 {
+        font-size: 2rem;
+        margin-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 calc(var(--space-unit) * 6);
+    }
+    
+    .form-section-title {
+        grid-column: 1 / -1;
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        color: var(--color-primary);
+        margin-top: calc(var(--space-unit) * 4);
+        margin-bottom: calc(var(--space-unit) * 4);
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: calc(var(--space-unit) * 3);
+        font-size: 1rem;
+        margin-top: calc(var(--space-unit) * 4);
+    }
+    
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: calc(var(--space-unit) * 6);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        font-family: var(--font-body);
+    }
+    
+    .back-link:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+    
+    textarea.input-field {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    @media (max-width: 600px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="card">
+        <div class="register-header">
+            <h1>Company Registration</h1>
+            <p>Create your PlaceMate company profile</p>
+        </div>
+        
+        <form method="post" action="{% url 'accounts:register_company' %}">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <h3 class="form-section-title">Account Information</h3>
+                
+                <div class="input-group">
+                    <label for="email" class="input-label">HR / Contact Email *</label>
+                    <input type="email" id="email" name="email" class="input-field" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password" class="input-label">Password *</label>
+                    <input type="password" id="password" name="password" class="input-field" required>
+                </div>
+                
+                <h3 class="form-section-title">Company Profile</h3>
+                
+                <div class="input-group full-width">
+                    <label for="company_name" class="input-label">Company Name *</label>
+                    <input type="text" id="company_name" name="company_name" class="input-field" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="industry" class="input-label">Industry</label>
+                    <input type="text" id="industry" name="industry" class="input-field" placeholder="e.g. Software, Finance">
+                </div>
+                
+                <div class="input-group">
+                    <label for="website" class="input-label">Website</label>
+                    <input type="url" id="website" name="website" class="input-field" placeholder="https://">
+                </div>
+                
+                <div class="input-group full-width">
+                    <label for="location" class="input-label">Headquarters / Location</label>
+                    <input type="text" id="location" name="location" class="input-field">
+                </div>
+                
+                <div class="input-group full-width">
+                    <label for="description" class="input-label">Company Description</label>
+                    <textarea id="description" name="description" class="input-field" placeholder="Brief overview of the company..."></textarea>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-submit">Register as Company</button>
+        </form>
+        
+        <a href="{% url 'accounts:register' %}" class="back-link">&larr; Back to Role Selection</a>
+    </div>
+</div>
+{% endblock %}

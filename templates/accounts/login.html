@@ -1,0 +1,102 @@
+{% extends 'shared/base.html' %}
+
+{% block title %}Log In - Placement Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: var(--color-background);
+    }
+    
+    .login-wrapper {
+        width: 100%;
+        max-width: 400px;
+        padding: calc(var(--space-unit) * 4);
+    }
+    
+    .login-card {
+        box-shadow: var(--shadow-md); /* Elevated shadow for modal focus */
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: calc(var(--space-unit) * 6);
+    }
+    
+    .login-header h1 {
+        font-size: 2rem;
+        margin-bottom: calc(var(--space-unit) * 2);
+    }
+    
+    .login-header p {
+        color: var(--color-text-secondary);
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    .login-form .btn-submit {
+        width: 100%;
+        padding: calc(var(--space-unit) * 3);
+        font-size: 1rem;
+        margin-top: calc(var(--space-unit) * 4);
+    }
+    
+    .auth-links {
+        margin-top: calc(var(--space-unit) * 4);
+        text-align: center;
+        font-family: var(--font-body);
+    }
+    
+    .forgot-password, .register-link {
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .forgot-password:hover, .register-link:hover {
+        text-decoration: underline;
+    }
+    
+    .register-prompt {
+        font-size: 0.875rem;
+        color: var(--color-text-secondary);
+        margin-top: calc(var(--space-unit) * 2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="card login-card">
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+            <p>Log in to the PlaceMate</p>
+        </div>
+        
+        <form class="login-form" method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+            
+            <div class="input-group">
+                <label for="email" class="input-label">Email Address</label>
+                <input type="email" id="email" name="email" class="input-field" placeholder="Enter your email" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="password" class="input-label">Password</label>
+                <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-submit">Log In</button>
+        </form>
+        
+        <div class="auth-links">
+            <a href="#" class="forgot-password">Forgot Password?</a>
+            <p class="register-prompt">Not a user? <a href="{% url 'accounts:register' %}" class="register-link">Register here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

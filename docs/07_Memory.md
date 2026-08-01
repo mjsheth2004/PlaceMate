@@ -51,15 +51,24 @@ happened, for planning purposes.
 
 | Area | Status |
 |---|---|
-| Documentation (`docs/`) | 6 of 10 files complete: `01_SRS.md`–`06_Design.md` |
-| Remaining docs | `08_Database_Design.md`, `09_Testing.md`, `10_Deployment.md` |
-| Code implementation | Not yet started — Phase 0 (`05_Phases.md`) not begun |
-| Current phase | Pre-Phase 0 (documentation/planning stage) |
-| Next up | Finish remaining docs, then begin Phase 0: project setup |
+| Documentation (`docs/`) | Core docs created. |
+| Code implementation | Started. Django project initialized. Login & Registration UI built. |
+| Current phase | Phase 1 (Auth & Profile Setup) - UI Implementation |
+| Next up | Implement backend authentication logic and database models |
 
 ---
 
 ## 4. Completed Tasks Log
+
+### 2026-08-01 — Code Implementation — Registration Flow UI Created
+- What was done: Built the full UI for User Registration (Role Selection, Student form, Company form). Updated login page with a registration link. Created corresponding views and URLs in the `accounts` app.
+- Files/docs touched: `login.html`, `register_selection.html`, `register_student.html`, `register_company.html`, `apps/accounts/views.py`, `apps/accounts/urls.py`.
+- Decisions or notes: Forms include CSRF tokens and required fields matching `08_Database_Design.md`. Backend model saving logic to be implemented later.
+
+### 2026-08-01 — Code Implementation — Base UI & Login Page Created
+- What was done: Established `base.html` loading Google Fonts (Sora, Inter, JetBrains Mono). Implemented `theme.css` using tokens from `06_Design.md`. Built `login.html` and set it as the default root view.
+- Files/docs touched: `theme.css`, `base.html`, `login.html`, `config/urls.py`, `apps/accounts/views.py`, `apps/accounts/urls.py`.
+- Decisions or notes: Strictly followed the SaaS-dashboard design aesthetic.
 
 ### 2026-08-01 — Documentation — `06_Design.md` created
 - What was done: Defined the visual design system — color tokens
