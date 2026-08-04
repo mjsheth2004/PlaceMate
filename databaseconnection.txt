@@ -1,0 +1,23 @@
+
+Step 1: Create the Cloud Database
+Go to Neon.tech (or Supabase) and create a free account.
+Click "New Project" and choose PostgreSQL.
+Once created, it will give you a Connection String (also known as a Database URL). It will look something like this: postgresql://mrunal:password123@ep-cool-sun.us-east-2.aws.neon.tech/placemate
+Step 2: Add it to your project
+In your code editor, look for the new file I just created for you called .env.example.
+Rename that file to just .env. (Note: This file is already ignored in .gitignore, so your password won't be leaked on GitHub).
+Paste your Neon.tech Connection String into that file like this:
+env
+DATABASE_URL="postgresql://your_neon_url_here"
+Step 3: Apply the Database
+Run these commands in your terminal to install the new PostgreSQL libraries and set up the tables on the live database:
+
+bash
+# 1. Install the new PostgreSQL dependencies
+pip install -r requirements.txt
+# 2. Push your Django tables to the new cloud database
+python manage.py migrate
+# 3. Create a superuser on the cloud database
+python manage.py createsuperuser
+Step 4: Share with your friend!
+Now, all you have to do is message that DATABASE_URL string to your friend on WhatsApp/Discord. When they clone your GitHub repository, they just need to create their own .env file on their computer and paste the exact same URL into it. As long as you both have the same URL in your .env files, you are both securely connected to the same live database!

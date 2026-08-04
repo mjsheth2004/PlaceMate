@@ -10,12 +10,12 @@ from apps.company_portal.models import CompanyProfile
 @login_required
 def login_redirect_view(request):
     user = request.user
-    if user.role == User.STUDENT:
+    if user.is_superuser or user.role == User.OFFICER:
+        return redirect('/admin/')
+    elif user.role == User.STUDENT:
         return redirect('student_portal:dashboard')
     elif user.role == User.COMPANY:
         return redirect('company_portal:dashboard')
-    elif user.role == User.OFFICER or user.is_superuser:
-        return redirect('/admin/')
     else:
         return redirect('accounts:login')
 
