@@ -1,0 +1,110 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block title %}Company Portal - PlaceMate{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company_portal/css/sidebar.css' %}?v=2.1">
+<link rel="stylesheet" href="{% static 'company_portal/css/company_portal.css' %}?v=2.1">
+{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Top Navbar (Desktop & Mobile Header) -->
+    <header class="top-navbar">
+        <div class="navbar-brand">
+            <a href="{% url 'company_portal:profile' %}" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+                {% if user.companyprofile.logo %}
+                    <img src="{{ user.companyprofile.logo.url }}" alt="Company Logo" class="brand-avatar-img" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover;">
+                {% else %}
+                    <div class="logo-square">{{ user.companyprofile.company_name|default:user.email|make_list|first|upper }}</div>
+                {% endif %}
+                <h2 class="brand-title" style="margin: 0; font-size: 1.15rem;">{{ user.companyprofile.company_name|default:user.email }}</h2>
+            </a>
+        </div>
+
+        <button class="btn-toggle-sidebar" id="sidebarToggle" aria-label="Toggle Sidebar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <nav class="desktop-nav">
+            <a href="{% url 'company_portal:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <a href="{% url 'company_portal:drives_list' %}" class="nav-item {% if 'drive' in request.resolver_match.url_name %}active{% endif %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                Placement Drives
+            </a>
+            <a href="{% url 'company_portal:applicants_list' %}" class="nav-item {% if request.resolver_match.url_name == 'applicants_list' %}active{% endif %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Applicants
+            </a>
+            <a href="{% url 'company_portal:profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'edit_profile' %}active{% endif %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Profile
+            </a>
+        </nav>
+
+        <div class="navbar-actions">
+            <div class="theme-switch-wrapper">
+                <label class="theme-btn-label">
+                    <input type="checkbox" id="themeToggleCheckboxDesktop" class="theme-checkbox-hidden">
+                    <span class="theme-btn-content">
+                        <span class="theme-icon"></span>
+                        <span class="theme-text"></span>
+                    </span>
+                </label>
+            </div>
+            <a href="{% url 'accounts:login' %}" class="btn-logout-bordered" title="Log Out">
+                Logout
+            </a>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Mobile Sidebar -->
+    <aside class="mobile-sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{% url 'company_portal:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'company_portal:drives_list' %}" class="nav-item {% if 'drive' in request.resolver_match.url_name %}active{% endif %}">Placement Drives</a>
+            <a href="{% url 'company_portal:create_drive' %}" class="nav-item">Post New Drive</a>
+            <a href="{% url 'company_portal:applicants_list' %}" class="nav-item {% if request.resolver_match.url_name == 'applicants_list' %}active{% endif %}">Applicants</a>
+            <a href="{% url 'company_portal:profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'edit_profile' %}active{% endif %}">Company Profile</a>
+        </nav>
+
+        <div class="sidebar-footer" style="padding: 1.5rem;">
+            <div class="theme-switch-wrapper" style="margin-bottom: 1rem;">
+                <label class="theme-btn-label">
+                    <input type="checkbox" id="themeToggleCheckbox" class="theme-checkbox-hidden">
+                    <span class="theme-btn-content">
+                        <span class="theme-icon"></span>
+                        <span class="theme-text"></span>
+                    </span>
+                </label>
+            </div>
+            <a href="{% url 'accounts:login' %}" class="btn-logout-bordered" style="width: 100%; justify-content: center;">
+                Log Out
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="content-area">
+            {% block company_content %}
+            {% endblock %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'company_portal/js/sidebar.js' %}?v=2.0"></script>
+{% endblock %}

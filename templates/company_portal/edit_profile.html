@@ -1,0 +1,66 @@
+{% extends 'company_portal/base.html' %}
+
+{% block title %}Edit Company Profile - PlaceMate{% endblock %}
+
+{% block company_content %}
+<div class="cp-page-header">
+    <div>
+        <h1>Edit Company Profile</h1>
+        <p>Update your branding, industry, headquarters, and organization bio.</p>
+    </div>
+    <div>
+        <a href="{% url 'company_portal:profile' %}" class="btn btn-secondary" style="text-decoration: none;">Cancel</a>
+    </div>
+</div>
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="id_company_name" class="input-label">Company Name *</label>
+                {{ form.company_name }}
+                {% if form.company_name.errors %}
+                    <span style="color: red; font-size: 0.82rem;">{{ form.company_name.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="input-group">
+                <label for="id_industry" class="input-label">Industry / Sector</label>
+                {{ form.industry }}
+            </div>
+
+            <div class="input-group">
+                <label for="id_website" class="input-label">Website URL</label>
+                {{ form.website }}
+            </div>
+
+            <div class="input-group">
+                <label for="id_location" class="input-label">Location / Headquarters</label>
+                {{ form.location }}
+            </div>
+
+            <div class="input-group form-group-full">
+                <label for="id_logo" class="input-label">Company Logo (Image File)</label>
+                {{ form.logo }}
+                {% if company_profile.logo %}
+                    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--color-text-secondary);">
+                        Current logo: <a href="{{ company_profile.logo.url }}" target="_blank">View File</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="input-group form-group-full">
+                <label for="id_description" class="input-label">Company Description & Bio</label>
+                {{ form.description }}
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+            <a href="{% url 'company_portal:profile' %}" class="btn btn-secondary" style="text-decoration: none;">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Profile Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'company_portal/base.html' %}
+
+{% block title %}Placement Drives - PlaceMate{% endblock %}
+
+{% block company_content %}
+<div class="cp-page-header">
+    <div>
+        <h1>Placement Drives</h1>
+        <p>Manage all your job drives, set eligibility parameters, and view applicant counts.</p>
+    </div>
+    <div>
+        <a href="{% url 'company_portal:create_drive' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Post New Drive
+        </a>
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="?status=all" class="filter-tab {% if status_filter == 'all' %}active{% endif %}">All Drives</a>
+    <a href="?status=published" class="filter-tab {% if status_filter == 'published' %}active{% endif %}">Published / Active</a>
+    <a href="?status=draft" class="filter-tab {% if status_filter == 'draft' %}active{% endif %}">Drafts</a>
+    <a href="?status=closed" class="filter-tab {% if status_filter == 'closed' %}active{% endif %}">Closed</a>
+</div>
+
+{% if drives %}
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Job Title / Role</th>
+                <th>Status</th>
+                <th>Salary (LPA)</th>
+                <th>Location</th>
+                <th>Applicants</th>
+                <th>Deadline</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for drive in drives %}
+            <tr>
+                <td>
+                    <a href="{% url 'company_portal:drive_detail' drive.pk %}" style="font-weight: 600; color: var(--color-text-primary); text-decoration: none;">
+                        {{ drive.title }}
+                    </a>
+                </td>
+                <td>
+                    <span class="status-badge {{ drive.status }}">{{ drive.get_status_display }}</span>
+                </td>
+                <td style="font-weight: 600;">₹{{ drive.salary_package }} LPA</td>
+                <td>{{ drive.location }}</td>
+                <td>
+                    <span style="font-weight: 600; color: var(--color-primary);">{{ drive.applicant_count }}</span> candidates
+                </td>
+                <td>{{ drive.application_deadline|date:"d M Y, h:i A" }}</td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'company_portal:drive_detail' drive.pk %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; text-decoration: none;">View</a>
+                        <a href="{% url 'company_portal:edit_drive' drive.pk %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; text-decoration: none;">Edit</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem 1.5rem; color: var(--color-text-secondary);">
+    <div style="font-size: 3rem; margin-bottom: 0.5rem;">📢</div>
+    <h3>No drives found</h3>
+    <p>You have not created any placement drives matching this filter yet.</p>
+    <a href="{% url 'company_portal:create_drive' %}" class="btn btn-primary" style="margin-top: 1rem; text-decoration: none;">Post New Drive Now</a>
+</div>
+{% endif %}
+{% endblock %}

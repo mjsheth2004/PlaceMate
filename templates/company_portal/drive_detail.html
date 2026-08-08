@@ -1,0 +1,170 @@
+{% extends 'company_portal/base.html' %}
+
+{% block title %}{{ drive.title }} - PlaceMate Recruiter{% endblock %}
+
+{% block company_content %}
+<div class="cp-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <h1>{{ drive.title }}</h1>
+            <span class="status-badge {{ drive.status }}">{{ drive.get_status_display }}</span>
+        </div>
+        <p>{{ drive.company.company_name }} &bull; Posted on {{ drive.created_at|date:"d M Y" }}</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{% url 'company_portal:edit_drive' drive.pk %}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit Drive
+        </a>
+    </div>
+</div>
+
+<!-- Key Highlights Bar -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">💰</div>
+        <div class="stat-info">
+            <div class="stat-value">₹{{ drive.salary_package }} LPA</div>
+            <div class="stat-label">Salary Package</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon info">👥</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_applicants }}</div>
+            <div class="stat-label">Total Applicants</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon warning">⭐</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ shortlisted_count }}</div>
+            <div class="stat-label">Shortlisted</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">🎉</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ selected_count }}</div>
+            <div class="stat-label">Selected</div>
+        </div>
+    </div>
+</div>
+
+<!-- Drive Description & Eligibility -->
+<div class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin: 0 0 1rem 0; color: var(--color-text-primary);">Job Details & Criteria</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; background: var(--color-background); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--color-border);">
+        <div>
+            <strong style="color: var(--color-text-secondary); font-size: 0.85rem;">LOCATION</strong>
+            <div style="font-weight: 600; color: var(--color-text-primary); font-size: 1.05rem;">{{ drive.location }}</div>
+        </div>
+        <div>
+            <strong style="color: var(--color-text-secondary); font-size: 0.85rem;">MINIMUM CGPA</strong>
+            <div style="font-weight: 600; color: var(--color-text-primary); font-size: 1.05rem;">{{ drive.min_cgpa }} CGPA</div>
+        </div>
+        <div>
+            <strong style="color: var(--color-text-secondary); font-size: 0.85rem;">MAX BACKLOGS</strong>
+            <div style="font-weight: 600; color: var(--color-text-primary); font-size: 1.05rem;">{{ drive.max_backlogs }}</div>
+        </div>
+        <div>
+            <strong style="color: var(--color-text-secondary); font-size: 0.85rem;">BATCH / PASSING YEAR</strong>
+            <div style="font-weight: 600; color: var(--color-text-primary); font-size: 1.05rem;">{{ drive.eligible_passing_year }} Batch</div>
+        </div>
+        <div>
+            <strong style="color: var(--color-text-secondary); font-size: 0.85rem;">APPLICATION DEADLINE</strong>
+            <div style="font-weight: 600; color: var(--color-text-primary); font-size: 1.05rem;">{{ drive.application_deadline|date:"d M Y, h:i A" }}</div>
+        </div>
+    </div>
+
+    <div>
+        <h4 style="margin: 0 0 0.5rem 0; color: var(--color-text-primary);">Eligible Departments</h4>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            {% for dept in drive.eligible_departments.all %}
+                <span style="background: var(--color-primary-lighter); color: var(--color-primary); font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">
+                    {{ dept.name }}
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <h4 style="margin: 0 0 0.5rem 0; color: var(--color-text-primary);">Description</h4>
+        <p style="color: var(--color-text-secondary); line-height: 1.6; margin: 0; white-space: pre-line;">{{ drive.job_description }}</p>
+    </div>
+</div>
+
+<!-- Applicants Table for this Drive -->
+<div class="cp-page-header" style="margin-bottom: 1rem;">
+    <h2>Drive Candidates ({{ total_applicants }})</h2>
+    
+    <div class="filter-tabs" style="margin: 0; border: none;">
+        <a href="?status=all" class="filter-tab {% if status_filter == 'all' %}active{% endif %}">All</a>
+        <a href="?status=applied" class="filter-tab {% if status_filter == 'applied' %}active{% endif %}">Applied</a>
+        <a href="?status=shortlisted" class="filter-tab {% if status_filter == 'shortlisted' %}active{% endif %}">Shortlisted</a>
+        <a href="?status=interview_scheduled" class="filter-tab {% if status_filter == 'interview_scheduled' %}active{% endif %}">Interview</a>
+        <a href="?status=selected" class="filter-tab {% if status_filter == 'selected' %}active{% endif %}">Selected</a>
+        <a href="?status=rejected" class="filter-tab {% if status_filter == 'rejected' %}active{% endif %}">Rejected</a>
+    </div>
+</div>
+
+{% if applications %}
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Roll Number</th>
+                <th>Department</th>
+                <th>CGPA</th>
+                <th>Resume</th>
+                <th>Applied On</th>
+                <th>Status</th>
+                <th>Update Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td style="font-weight: 600;">{{ app.student.full_name }}</td>
+                <td>{{ app.student.roll_number }}</td>
+                <td>{{ app.student.department.name }}</td>
+                <td style="font-weight: 600; color: var(--color-primary);">{{ app.student.cgpa }}</td>
+                <td>
+                    {% if app.student.resume %}
+                        <a href="{{ app.student.resume.url }}" target="_blank" class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Resume
+                        </a>
+                    {% else %}
+                        <span style="color: var(--color-text-secondary); font-size: 0.82rem;">Not uploaded</span>
+                    {% endif %}
+                </td>
+                <td>{{ app.applied_at|date:"d M, Y" }}</td>
+                <td>
+                    <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'company_portal:update_application_status' app.pk %}" style="display: flex; gap: 0.5rem;">
+                        {% csrf_token %}
+                        <select name="status" class="input-field" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; width: auto;" onchange="this.form.submit()">
+                            <option value="applied" {% if app.status == 'applied' %}selected{% endif %}>Applied</option>
+                            <option value="shortlisted" {% if app.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+                            <option value="interview_scheduled" {% if app.status == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
+                            <option value="selected" {% if app.status == 'selected' %}selected{% endif %}>Selected</option>
+                            <option value="rejected" {% if app.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 2.5rem; color: var(--color-text-secondary);">
+    <p style="margin: 0;">No candidate applications matching this criteria.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,15 +1,123 @@
-{% extends 'shared/base.html' %}
+{% extends 'company_portal/base.html' %}
 
-{% block title %}Company Dashboard - Placement Portal{% endblock %}
+{% block title %}Recruiter Dashboard - PlaceMate{% endblock %}
 
-{% block content %}
-<div class="dashboard-header">
-    <h1>Welcome, {{ user.companyprofile.company_name|default:user.email }}</h1>
-    <p>This is your company dashboard. Here you can manage your company profile, announce recruitment drives, and review applicants.</p>
+{% block company_content %}
+<div class="cp-page-header">
+    <div>
+        <h1>Welcome, {{ company_profile.company_name }}</h1>
+        <p>Recruiter Dashboard &bull; Manage placement drives, review candidates, and publish selection results.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{% url 'company_portal:create_drive' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Post New Drive
+        </a>
+    </div>
 </div>
 
-<div class="card" style="margin-top: calc(var(--space-unit) * 6);">
-    <h3>Recent Activity</h3>
-    <p>Your dashboard is currently under construction. Please check back later!</p>
+<!-- Metrics Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">🏢</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_drives_count }}</div>
+            <div class="stat-label">Total Drives Posted</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">📢</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ published_drives_count }}</div>
+            <div class="stat-label">Active / Published</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon info">👥</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_applications_count }}</div>
+            <div class="stat-label">Total Applications</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon warning">⭐</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ shortlisted_count }}</div>
+            <div class="stat-label">Shortlisted Candidates</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid Layout -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+    
+    <!-- Active Drives Card -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h3 style="margin: 0; font-size: 1.15rem; color: var(--color-text-primary);">Your Placement Drives</h3>
+            <a href="{% url 'company_portal:drives_list' %}" style="font-size: 0.88rem; font-weight: 600; color: var(--color-primary); text-decoration: none;">View All &rarr;</a>
+        </div>
+        
+        {% if recent_drives %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for drive in recent_drives %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-background);">
+                    <div>
+                        <a href="{% url 'company_portal:drive_detail' drive.pk %}" style="font-weight: 600; color: var(--color-text-primary); text-decoration: none; font-size: 1rem;">
+                            {{ drive.title }}
+                        </a>
+                        <div style="font-size: 0.82rem; color: var(--color-text-secondary); margin-top: 0.2rem;">
+                            Package: ₹{{ drive.salary_package }} LPA &bull; {{ drive.location }}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="status-badge {{ drive.status }}">{{ drive.get_status_display }}</span>
+                        <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 0.3rem;">
+                            Deadline: {{ drive.application_deadline|date:"d M, Y" }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--color-text-secondary);">
+                <p style="margin: 0 0 1rem 0;">No placement drives posted yet.</p>
+                <a href="{% url 'company_portal:create_drive' %}" class="btn btn-primary" style="font-size: 0.88rem;">Create your first drive</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Applicants Card -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h3 style="margin: 0; font-size: 1.15rem; color: var(--color-text-primary);">Recent Applicants</h3>
+            <a href="{% url 'company_portal:applicants_list' %}" style="font-size: 0.88rem; font-weight: 600; color: var(--color-primary); text-decoration: none;">View Roster &rarr;</a>
+        </div>
+        
+        {% if recent_applications %}
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                {% for app in recent_applications %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--color-border);">
+                    <div>
+                        <div style="font-weight: 600; color: var(--color-text-primary); font-size: 0.95rem;">
+                            {{ app.student.full_name }}
+                        </div>
+                        <div style="font-size: 0.82rem; color: var(--color-text-secondary);">
+                            {{ app.drive.title }} &bull; CGPA: {{ app.student.cgpa }}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--color-text-secondary);">
+                <p style="margin: 0;">No applicant activity yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}
