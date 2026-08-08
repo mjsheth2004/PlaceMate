@@ -27,3 +27,24 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return f"{self.full_name} ({self.roll_number})"
+
+class Application(models.Model):
+    STATUS_CHOICES = [
+        ('applied', 'Applied'),
+        ('shortlisted', 'Shortlisted'),
+        ('interview_scheduled', 'Interview Scheduled'),
+        ('selected', 'Selected'),
+        ('rejected', 'Rejected'),
+    ]
+
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    drive = models.ForeignKey('common.PlacementDrive', on_delete=models.CASCADE)
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='applied')
+    applied_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'drive')
+
+    def __str__(self):
+        return f"{self.student.roll_number} - {self.drive.title} ({self.status})"

@@ -1,0 +1,70 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Placement Drives - PlaceMate{% endblock %}
+
+{% block student_content %}
+<div class="sp-page-header">
+    <div>
+        <h1>Placement Drives</h1>
+        <p>Browse and apply to the latest placement opportunities.</p>
+    </div>
+</div>
+
+<div class="drives-grid-list">
+    {% for data in drives_data %}
+    <div class="card drive-card-interactive">
+        
+        <!-- Status Ribbon -->
+        {% if data.has_applied %}
+            <div class="status-ribbon-applied">Applied</div>
+        {% elif not data.is_eligible %}
+            <div class="status-ribbon-ineligible">Ineligible</div>
+        {% endif %}
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+            <div class="company-avatar-box lg">
+                {{ data.drive.company.company_name|make_list|first|upper }}
+            </div>
+            <div>
+                <h3 style="margin: 0 0 0.25rem 0; color: var(--color-text-primary); font-size: 1.2rem;">{{ data.drive.title }}</h3>
+                <p style="margin: 0; color: var(--color-text-secondary); font-size: 0.9rem; font-weight: 500;">{{ data.drive.company.company_name }} &bull; {{ data.drive.location }}</p>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: var(--color-background); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+            <div>
+                <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-secondary); display: block; margin-bottom: 0.25rem; font-weight: 600;">Salary Package</span>
+                <span style="font-weight: 700; color: var(--color-primary); font-size: 1rem;">₹{{ data.drive.salary_package|default:"TBD" }}</span>
+            </div>
+            <div>
+                <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-secondary); display: block; margin-bottom: 0.25rem; font-weight: 600;">Deadline</span>
+                <span style="font-weight: 700; color: var(--status-rejected); font-size: 1rem;">{{ data.drive.application_deadline|date:"d M Y" }}</span>
+            </div>
+        </div>
+
+        {% if not data.is_eligible and not data.has_applied %}
+            <div class="ineligible-reasons-box">
+                <p class="ineligible-reasons-title">Why you are ineligible:</p>
+                <ul class="ineligible-reasons-list">
+                    {% for reason in data.reasons %}
+                        <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <a href="{% url 'student_portal:drive_detail' data.drive.id %}" class="btn {% if data.has_applied %}btn-secondary{% else %}btn-primary{% endif %}" style="width: 100%; text-align: center; display: block; {% if not data.is_eligible and not data.has_applied %}opacity: 0.7;{% endif %}">
+            {% if data.has_applied %}View Application{% else %}View Details{% endif %}
+        </a>
+    </div>
+    {% empty %}
+    <div class="empty-state-box" style="grid-column: 1 / -1;">
+        <div class="empty-state-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        </div>
+        <h3>No active drives found</h3>
+        <p>There are currently no published placement drives. Please check back later.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

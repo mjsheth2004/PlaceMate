@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; }
+        .header { text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { font-size: 22px; margin: 0; }
+        .status-box { padding: 15px 20px; border-radius: 8px; font-weight: 600; font-size: 18px; text-align: center; margin: 20px 0; }
+        .status-selected { background-color: rgba(35, 134, 54, 0.2); border: 1px solid #238636; color: #3fb950; }
+        .status-shortlisted { background-color: rgba(210, 153, 34, 0.2); border: 1px solid #d29922; color: #e3b341; }
+        .status-interview { background-color: rgba(88, 166, 255, 0.2); border: 1px solid #58a6ff; color: #58a6ff; }
+        .status-rejected { background-color: rgba(248, 81, 73, 0.2); border: 1px solid #f85149; color: #f85149; }
+        .details-box { background-color: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .btn { display: inline-block; background-color: #238636; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 15px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #8b949e; border-top: 1px solid #30363d; padding-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="color: #58a6ff;">Application Status Update</h1>
+        </div>
+        <div class="content">
+            <p>Hi {{ student_name }},</p>
+            <p>There has been an update regarding your application for the following placement drive:</p>
+
+            <div class="details-box">
+                <p style="margin: 4px 0;"><strong>Company:</strong> {{ company_name }}</p>
+                <p style="margin: 4px 0;"><strong>Role:</strong> {{ drive_title }}</p>
+            </div>
+
+            <div class="status-box status-{{ status_class }}">
+                Status: {{ status_display }}
+            </div>
+
+            {% if status_class == 'selected' %}
+                <p>🎉 <strong>Congratulations!</strong> You have been selected for this position. The placement officer or recruiter will contact you shortly regarding the next steps and official offer letter.</p>
+            {% elif status_class == 'shortlisted' %}
+                <p>⭐ You have been <strong>Shortlisted</strong>! Keep an eye on your portal and inbox for upcoming round schedules.</p>
+            {% elif status_class == 'interview' %}
+                <p>📅 An <strong>Interview</strong> has been scheduled for your application. Please log into PlaceMate for schedule details and guidelines.</p>
+            {% elif status_class == 'rejected' %}
+                <p>Thank you for participating in this drive. Although you were not selected for this role, keep applying to upcoming placement drives on PlaceMate!</p>
+            {% endif %}
+
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="{{ portal_url }}" class="btn">View My Applications</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; PlaceMate Campus Placement System</p>
+        </div>
+    </div>
+</body>
+</html>

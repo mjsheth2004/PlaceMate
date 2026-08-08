@@ -23,8 +23,7 @@ complement it.
 The product's job is to make a formal, high-stakes process (recruitment
 outcomes) feel clear and trustworthy on screen — not playful, not
 decorative. The palette is a clean, structured SaaS-dashboard direction:
-cool blue as the primary brand color, teal as a secondary "positive
-action" accent, and a light neutral background with white cards. Status
+deep teal as the primary brand color, warm gold as the supporting accent, a terracotta highlight, and a soft cream background. Status
 colors carry real information (where an application stands), so they're
 treated as functional, not decorative.
 
@@ -43,18 +42,18 @@ verified data, not prose.
 
 | Token | Hex | RGB | Usage |
 |---|---|---|---|
-| `--color-primary` | `#2563EB` | 37, 99, 235 | Headers, navigation, primary buttons, links |
-| `--color-accent` | `#0D9488` | 13, 148, 136 | Apply buttons, success states, highlights |
+| `--color-primary` | `#2A9D8F` | 37, 99, 235 | Headers, navigation, primary buttons, links |
+| `--color-accent` | `#2A9D8F` | 13, 148, 136 | Apply buttons, success states, highlights |
 
 ### 3.2 Neutrals & Layout
 
 | Token | Hex | Usage |
 |---|---|---|
-| `--color-background` | `#F9FAFB` | Overall page background |
-| `--color-surface` | `#FFFFFF` | Cards, modals, forms |
-| `--color-text-primary` | `#111827` | Main headings, body text |
-| `--color-text-secondary` | `#6B7280` | Captions, labels, secondary text |
-| `--color-border` | `#E5E7EB` | Dividers, input outlines |
+| `--color-background` | `#FDFBF7` | Overall page background |
+| `--color-surface` | `#FDFBF7` | Cards, modals, forms |
+| `--color-text-primary` | `#264653` | Main headings, body text |
+| `--color-text-secondary` | `#8A6D3B` | Captions, labels, secondary text |
+| `--color-border` | `#E9C46A` | Dividers, input outlines |
 
 ### 3.3 Status Colors — Application Tracking
 
@@ -65,11 +64,11 @@ colors:
 
 | Design Label | SRS Status (FR-STU-09) | Hex | Token |
 |---|---|---|---|
-| Applied | Applied | `#3B82F6` | `--status-applied` |
-| Under Review | Shortlisted | `#F59E0B` | `--status-shortlisted` |
-| Interview | Interview Scheduled | `#8B5CF6` | `--status-interview` |
-| Hired | Selected | `#10B981` | `--status-selected` |
-| Rejected | Rejected | `#EF4444` | `--status-rejected` |
+| Applied | Applied | `#2A9D8F` | `--status-applied` |
+| Under Review | Shortlisted | `#E9C46A` | `--status-shortlisted` |
+| Interview | Interview Scheduled | `#E76F51` | `--status-interview` |
+| Hired | Selected | `#2A9D8F` | `--status-selected` |
+| Rejected | Rejected | `#E76F51` | `--status-rejected` |
 
 Use the **Design Label** as the on-screen badge text (it reads better
 to students/companies) while the **SRS Status** stays as the backend
@@ -78,21 +77,21 @@ drift apart.
 
 ### 3.4 Accessibility Notes on Color
 
-- **"Under Review" badge:** white text on `#F59E0B` measures roughly
+- **"Under Review" badge:** white text on `#E9C46A` measures roughly
   **2.1:1 contrast** — well below the 4.5:1 needed for body-sized text
   under WCAG AA. Use dark text on this badge instead
-  (`--color-text-primary` `#111827`, which gives ~8.3:1), not white.
-- **Other status badges** (`#3B82F6`, `#8B5CF6`, `#EF4444`, `#10B981`)
+  (`--color-text-primary` `#264653`, which gives ~8.3:1), not white.
+- **Other status badges** (`#2A9D8F`, `#E76F51`, `#E76F51`, `#2A9D8F`)
   with white text land in the 2.5–3.7:1 range — fine for large/bold
   labels or icon-only chips, but borderline-to-failing for small badge
   text at AA. Before locking the UI, run each pairing through a
   contrast checker; if small white-on-color text is important for
   visual consistency, use the `-600`/`-700` shade of each hue (e.g.,
-  `#2563EB` instead of `#3B82F6` for the Applied badge — conveniently
+  `#2A9D8F` instead of `#2A9D8F` for the Applied badge — conveniently
   the same as `--color-primary`) rather than the base shade shown above.
-- `--color-text-secondary` (`#6B7280`) on `--color-background` /
-  `--color-surface` sits right around the AA minimum (~4.6:1) — fine
-  for labels and captions, but don't drop it any lighter.
+- `--color-text-secondary` (`#8A6D3B`) on `--color-background` /
+  `--color-surface` sits well above the AA minimum — ensuring good contrast
+  for labels and captions.
 
 ---
 
@@ -193,22 +192,22 @@ stylesheet, per the structure in `03_Architecture.md` §4.
 ```css
 :root {
   /* Primary & Accent */
-  --color-primary: #2563EB;
-  --color-accent: #0D9488;
+  --color-primary: #2A9D8F;
+  --color-accent: #2A9D8F;
 
   /* Neutrals & Layout */
-  --color-background: #F9FAFB;
-  --color-surface: #FFFFFF;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-border: #E5E7EB;
+  --color-background: #FDFBF7;
+  --color-surface: #FDFBF7;
+  --color-text-primary: #264653;
+  --color-text-secondary: #8A6D3B;
+  --color-border: #E9C46A;
 
   /* Status Colors */
-  --status-applied: #3B82F6;
-  --status-shortlisted: #F59E0B;
-  --status-interview: #8B5CF6;
-  --status-selected: #10B981;
-  --status-rejected: #EF4444;
+  --status-applied: #2A9D8F;
+  --status-shortlisted: #E9C46A;
+  --status-interview: #E76F51;
+  --status-selected: #2A9D8F;
+  --status-rejected: #E76F51;
 
   /* Typography */
   --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
@@ -266,8 +265,7 @@ h1, h2, h3, h4 {
 
 ## 8. Summary
 
-Color is locked to the reference palette (primary blue, teal accent, a
-light neutral system, and five functional status colors mapped
+Color is locked to the reference palette (deep teal, warm gold, terracotta, and soft cream with functional status colors mapped
 one-to-one onto the SRS's application lifecycle). Typography adds a
 deliberate identity — Sora for headings, Inter for body/UI, JetBrains
 Mono for verified numeric data — while staying restrained enough for a

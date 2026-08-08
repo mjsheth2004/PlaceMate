@@ -1,0 +1,129 @@
+{% extends 'student_portal/base.html' %}
+{% load static %}
+
+{% block title %}My Profile - PlaceMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'student_portal/css/student_profile.css' %}?v=1.2">
+{% endblock %}
+
+{% block student_content %}
+<div class="profile-header">
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+        {% if profile.profile_photo %}
+            <div id="photoModalTrigger" class="profile-avatar-clickable">
+                <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
+            </div>
+        {% else %}
+            <div class="profile-avatar-initials">
+                {{ profile.full_name|default:request.user.username|make_list|first|upper }}
+            </div>
+        {% endif %}
+        <div>
+            <h1>My Profile</h1>
+            <p style="color: var(--color-text-secondary);">View and manage your academic and personal information</p>
+        </div>
+    </div>
+    <a href="{% url 'student_portal:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+</div>
+
+<div class="profile-grid">
+    <!-- Personal Information -->
+    <div class="profile-card">
+        <h3>Personal Information</h3>
+        
+        <div class="info-row">
+            <span class="info-label">Full Name</span>
+            <span class="info-value">{{ profile.full_name }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Email Address</span>
+            <span class="info-value"><a href="mailto:{{ request.user.email }}">{{ request.user.email }}</a></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Roll Number</span>
+            <span class="info-value data-figure">{{ profile.roll_number }}</span>
+        </div>
+    </div>
+
+    <!-- Academic Record -->
+    <div class="profile-card">
+        <h3>Academic Record</h3>
+        
+        <div class="info-row">
+            <span class="info-label">University</span>
+            <span class="info-value">{{ profile.university }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Department</span>
+            <span class="info-value">{{ profile.department.name }}</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="info-row">
+                <span class="info-label">Current Semester</span>
+                <span class="info-value data-figure">{{ profile.semester }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">CGPA</span>
+                <span class="info-value data-figure">{{ profile.cgpa }}</span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="info-row">
+                <span class="info-label">Passing Year</span>
+                <span class="info-value data-figure">{{ profile.passing_year }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Active Backlogs</span>
+                <span class="info-value data-figure">{{ profile.active_backlogs }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills and Documents -->
+    <div class="profile-card" style="grid-column: 1 / -1;">
+        <h3>Skills & Documents</h3>
+        
+        <div class="info-row">
+            <span class="info-label">Core Skills</span>
+            <div class="skills-list">
+                {% for skill in profile.skills.all %}
+                    <span class="skill-badge">{{ skill.name }}</span>
+                {% empty %}
+                    <span style="color: var(--color-text-secondary); font-size: 0.875rem;">No skills added yet.</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="info-row" style="margin-top: 1rem;">
+            <span class="info-label">Resume</span>
+            <div class="resume-section">
+                {% if profile.resume %}
+                    <span style="font-weight: 500;">{{ profile.resume.name|cut:'resumes/' }}</span>
+                    <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem;">View / Download</a>
+                {% else %}
+                    <span style="color: var(--color-text-secondary);">No resume uploaded yet.</span>
+                    <a href="{% url 'student_portal:edit_profile' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Upload Resume</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Photo Modal -->
+<div id="photoModal" class="photo-modal-overlay">
+    {% if profile.profile_photo %}
+    <img src="{{ profile.profile_photo.url }}" class="photo-modal-img">
+    {% endif %}
+    <div id="photoModalClose" class="photo-modal-close">&times;</div>
+</div>
+
+{% endblock %}
