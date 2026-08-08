@@ -2,4 +2,9 @@ from django.apps import AppConfig
 
 
 class StudentPortalConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
     name = 'apps.student_portal'
+
+    def ready(self):
+        import apps.student_portal.signals
+

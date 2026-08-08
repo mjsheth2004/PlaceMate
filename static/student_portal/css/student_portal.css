@@ -1,0 +1,693 @@
+/* Student Portal General & Utility Layouts */
+.brand-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-primary);
+    transition: opacity 0.2s ease;
+}
+.brand-link:hover {
+    opacity: 0.8;
+}
+.brand-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.brand-avatar-initials {
+    background-color: var(--color-primary);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.brand-title {
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.1rem;
+    color: inherit;
+}
+
+.sidebar-user-link {
+    margin-bottom: 1rem;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.2s ease;
+}
+.sidebar-user-link:hover {
+    opacity: 0.8;
+}
+.sidebar-user-name {
+    color: var(--color-text-primary);
+}
+.sidebar-user-role {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+}
+.sidebar-logout-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--color-text-primary);
+}
+
+/* Dashboard Header & KPI Metrics */
+.sp-page-header {
+    margin-bottom: calc(var(--space-unit) * 6);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.sp-page-header h1 {
+    margin-bottom: 0.25rem;
+}
+.sp-page-header p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-size: 1rem;
+}
+.sp-header-actions {
+    display: flex;
+    gap: 1rem;
+}
+.sp-btn-outline {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: calc(var(--space-unit) * 4);
+    margin-bottom: calc(var(--space-unit) * 8);
+}
+.kpi-card {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.kpi-card.kpi-eligible {
+    border-left: 4px solid var(--color-primary);
+}
+.kpi-card.kpi-applications {
+    border-left: 4px solid var(--status-shortlisted);
+}
+.kpi-card.kpi-interviews {
+    border-left: 4px solid var(--status-interview);
+}
+.kpi-card.kpi-offers {
+    border-left: 4px solid var(--status-applied);
+}
+
+.kpi-icon-box {
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.kpi-eligible .kpi-icon-box {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+.kpi-applications .kpi-icon-box {
+    background: rgba(233, 196, 106, 0.15);
+    color: var(--status-shortlisted);
+}
+.kpi-interviews .kpi-icon-box {
+    background: rgba(231, 111, 81, 0.15);
+    color: var(--status-interview);
+}
+.kpi-offers .kpi-icon-box {
+    background: rgba(42, 157, 143, 0.15);
+    color: var(--status-applied);
+}
+
+.kpi-label {
+    margin: 0;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+.kpi-value {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--color-text-primary);
+}
+
+/* Profile Completion Card */
+.profile-completion-card {
+    margin-bottom: calc(var(--space-unit) * 8);
+    padding: 1.5rem 2rem;
+    border-left: 4px solid var(--status-interview);
+    background: var(--color-surface);
+    box-shadow: 0 4px 15px rgba(231,111,81,0.05);
+}
+.completion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.completion-title {
+    margin: 0 0 0.25rem 0;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.completion-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+.completion-percent {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--status-interview);
+}
+.completion-subtext {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+.progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--status-interview) 0%, var(--status-shortlisted) 100%);
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+.btn-complete-profile {
+    background: var(--status-interview);
+    color: white;
+    text-decoration: none;
+}
+
+/* Dashboard Content Grid */
+.dashboard-content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: calc(var(--space-unit) * 6);
+}
+.dashboard-column-card {
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+}
+.card-header-row {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-header-row h3 {
+    margin: 0;
+}
+.badge-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+.link-view-all {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Drive Item in Dashboard */
+.drive-item-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    background-color: var(--color-background);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.drive-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+.drive-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+.company-name-tag {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+.job-role-pill {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+.drive-item-title {
+    margin: 0 0 1rem 0;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+.drive-item-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--color-surface);
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+}
+.meta-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+.meta-value-deadline {
+    font-weight: 700;
+    color: var(--status-rejected);
+    font-size: 0.9rem;
+}
+.btn-block {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    display: block;
+    text-decoration: none;
+}
+
+/* Empty State Card */
+.empty-state-box {
+    text-align: center;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+}
+.empty-state-icon.yellow {
+    background: rgba(233, 196, 106, 0.15);
+    color: var(--status-shortlisted);
+}
+.empty-state-box h3, .empty-state-box h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--color-text-primary);
+}
+.empty-state-box p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Application List Items */
+.application-row {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    border-radius: var(--radius-sm);
+}
+.app-company-info {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.company-avatar-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+.company-avatar-box.lg {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    font-size: 1.8rem;
+}
+.company-avatar-box.xl {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    font-size: 2.5rem;
+}
+
+/* Placement Drives List Page */
+.drives-grid-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: calc(var(--space-unit) * 4);
+}
+.drive-card-interactive {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    background-color: var(--color-surface);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.drive-card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.status-ribbon-applied {
+    position: absolute;
+    top: 12px;
+    right: -30px;
+    background: var(--status-shortlisted);
+    color: white;
+    padding: 4px 30px;
+    transform: rotate(45deg);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.status-ribbon-ineligible {
+    position: absolute;
+    top: 12px;
+    right: -35px;
+    background: var(--status-rejected);
+    color: white;
+    padding: 4px 35px;
+    transform: rotate(45deg);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ineligible-reasons-box {
+    background: rgba(231, 111, 81, 0.1);
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.5rem;
+}
+.ineligible-reasons-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--status-rejected);
+}
+.ineligible-reasons-list {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+/* Status Badges & Pills */
+.status-pill {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.status-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-pill.applied {
+    background: rgba(42, 157, 143, 0.1);
+    color: var(--status-applied);
+}
+.status-pill.applied .status-pill-dot {
+    background: var(--status-applied);
+}
+.status-pill.shortlisted {
+    background: rgba(233, 196, 106, 0.1);
+    color: var(--status-shortlisted);
+}
+.status-pill.shortlisted .status-pill-dot {
+    background: var(--status-shortlisted);
+}
+.status-pill.interview {
+    background: rgba(244, 162, 97, 0.1);
+    color: var(--status-interview);
+}
+.status-pill.interview .status-pill-dot {
+    background: var(--status-interview);
+}
+.status-pill.selected {
+    background: rgba(42, 157, 143, 0.15);
+    color: var(--color-primary);
+}
+.status-pill.rejected {
+    background: rgba(231, 111, 81, 0.1);
+    color: var(--status-rejected);
+}
+
+/* Applications Page Layout */
+.applications-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-unit) * 4);
+}
+.app-card-interactive {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    background-color: var(--color-surface);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.app-card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Drive Detail Layout */
+.drive-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: calc(var(--space-unit) * 6);
+    align-items: start;
+}
+.drive-detail-column {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-unit) * 6);
+}
+.skill-tag {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.action-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+}
+
+/* Profile Photo Lightbox Modal */
+.photo-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+.photo-modal-overlay.active {
+    display: flex;
+}
+.photo-modal-img {
+    max-width: 40vw;
+    max-height: 40vh;
+    object-fit: contain;
+    border: 4px solid var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.5);
+    cursor: default;
+}
+.photo-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Profile Avatar Interactive */
+.profile-avatar-clickable {
+    display: inline-block;
+    cursor: pointer;
+}
+.profile-avatar-clickable img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-primary);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+}
+.profile-avatar-clickable img:hover {
+    transform: scale(1.05);
+}
+.profile-avatar-initials {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    font-size: 3rem;
+    font-weight: bold;
+    border: 3px solid var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Edit Profile Form Styles */
+.form-max-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.form-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--space-unit) * 4);
+    margin-bottom: calc(var(--space-unit) * 6);
+}
+.form-divider {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: calc(var(--space-unit) * 6) 0;
+}
+.upload-btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 5%;
+    margin-bottom: calc(var(--space-unit) * 6);
+    width: 100%;
+}
+.upload-btn-item {
+    width: 30%;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.file-name-text {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 8px;
+    text-align: center;
+    word-break: break-all;
+}
+
+/* Global Button Hover Contrast Fix */
+.btn-primary, a.btn-primary, button.btn-primary {
+    background-color: var(--color-primary) !important;
+    color: #FFFFFF !important;
+    text-decoration: none !important;
+}
+
+.btn-primary:hover, a.btn-primary:hover, button.btn-primary:hover {
+    background-color: #1f7a6e !important;
+    color: #FFFFFF !important;
+    text-decoration: none !important;
+}
+
+.btn-secondary, a.btn-secondary, button.btn-secondary {
+    background-color: transparent !important;
+    color: var(--color-primary) !important;
+    border: 1px solid var(--color-primary) !important;
+    text-decoration: none !important;
+}
+
+.btn-secondary:hover, a.btn-secondary:hover, button.btn-secondary:hover {
+    background-color: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
+    text-decoration: none !important;
+}
+

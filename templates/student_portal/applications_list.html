@@ -1,0 +1,79 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Applications - PlaceMate{% endblock %}
+
+{% block student_content %}
+<div class="sp-page-header">
+    <div>
+        <h1>My Applications</h1>
+        <p>Track the status of all your submitted applications.</p>
+    </div>
+</div>
+
+<div class="applications-list-container">
+    {% for app in applications %}
+    <div class="card app-card-interactive">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            
+            <!-- Left Side: Company and Drive Info -->
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+                <div class="company-avatar-box lg">
+                    {{ app.drive.company.company_name|make_list|first|upper }}
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 0.25rem 0; color: var(--color-text-primary); font-size: 1.25rem;">{{ app.drive.title }}</h3>
+                    <p style="margin: 0; color: var(--color-text-secondary); font-size: 1rem; font-weight: 500;">
+                        {{ app.drive.company.company_name }} &bull; {{ app.drive.location }}
+                    </p>
+                    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--color-text-secondary);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        Applied on: {{ app.applied_at|date:"d M Y, h:i A" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Status and Action -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                
+                {% if app.status == 'applied' %}
+                    <span class="status-pill applied">
+                        <span class="status-pill-dot"></span> Applied
+                    </span>
+                {% elif app.status == 'shortlisted' %}
+                    <span class="status-pill shortlisted">
+                        <span class="status-pill-dot"></span> Shortlisted
+                    </span>
+                {% elif app.status == 'interview_scheduled' %}
+                    <span class="status-pill interview">
+                        <span class="status-pill-dot"></span> Interview
+                    </span>
+                {% elif app.status == 'selected' %}
+                    <span class="status-pill selected">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Selected
+                    </span>
+                {% elif app.status == 'rejected' %}
+                    <span class="status-pill rejected">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Rejected
+                    </span>
+                {% else %}
+                    <span style="background: var(--color-background); color: var(--color-text-secondary); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--color-border);">
+                        {{ app.status }}
+                    </span>
+                {% endif %}
+
+                <a href="{% url 'student_portal:drive_detail' app.drive.id %}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Drive Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state-box">
+        <div class="empty-state-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h3>No applications found</h3>
+        <p>You haven't applied to any placement drives yet.</p>
+        <a href="{% url 'student_portal:drives_list' %}" class="btn btn-primary" style="margin-top: 1.5rem; text-decoration: none;">Browse Available Drives</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

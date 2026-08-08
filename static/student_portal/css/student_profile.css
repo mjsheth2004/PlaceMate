@@ -1,0 +1,79 @@
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: calc(var(--space-unit) * 6);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--space-unit) * 6);
+}
+
+.profile-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: calc(var(--space-unit) * 6);
+}
+
+.profile-card h3 {
+    color: var(--color-primary);
+    font-size: 1.25rem;
+    margin-bottom: calc(var(--space-unit) * 4);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: calc(var(--space-unit) * 2);
+}
+
+.info-row {
+    margin-bottom: calc(var(--space-unit) * 3);
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    margin-bottom: calc(var(--space-unit) * 1);
+}
+
+.info-value {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-primary);
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--space-unit) * 2);
+}
+
+.skill-badge {
+    background-color: rgba(13, 148, 136, 0.1);
+    color: var(--color-accent);
+    padding: calc(var(--space-unit) * 1) calc(var(--space-unit) * 3);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.resume-section {
+    margin-top: calc(var(--space-unit) * 4);
+    padding: calc(var(--space-unit) * 4);
+    background-color: var(--color-background);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}

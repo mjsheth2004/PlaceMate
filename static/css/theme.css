@@ -1,21 +1,23 @@
 :root {
   /* Primary & Accent */
-  --color-primary: #2563EB;
-  --color-accent: #0D9488;
+  --color-primary: #2A9D8F;
+  --color-accent: #2A9D8F;
+  --color-primary-light: rgba(42, 157, 143, 0.08);
+  --color-primary-lighter: rgba(42, 157, 143, 0.05);
 
   /* Neutrals & Layout */
-  --color-background: #F9FAFB;
-  --color-surface: #FFFFFF;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-border: #E5E7EB;
+  --color-background: #FDFBF7;
+  --color-surface: #FDFBF7;
+  --color-text-primary: #264653;
+  --color-text-secondary: #8A6D3B;
+  --color-border: #E9C46A;
 
   /* Status Colors */
-  --status-applied: #3B82F6;
-  --status-shortlisted: #F59E0B;
-  --status-interview: #8B5CF6;
-  --status-selected: #10B981;
-  --status-rejected: #EF4444;
+  --status-applied: #2A9D8F;
+  --status-shortlisted: #E9C46A;
+  --status-interview: #E76F51;
+  --status-selected: #2A9D8F;
+  --status-rejected: #E76F51;
 
   /* Typography */
   --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
@@ -42,6 +44,7 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 *, *::before, *::after {
@@ -60,7 +63,7 @@ h1, h2, h3, h4 {
 }
 
 /* Base UI Components */
-.btn {
+.btn, a.btn, button.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -72,16 +75,51 @@ h1, h2, h3, h4 {
   border: none;
   transition: all 0.2s ease;
   font-size: 0.875rem;
+  text-decoration: none !important;
 }
 
-.btn-primary {
+.btn-primary, a.btn-primary, button.btn-primary {
   background-color: var(--color-primary);
-  color: #FFFFFF;
+  color: #FFFFFF !important;
 }
 
-.btn-primary:hover {
-  background-color: #1D4ED8;
+.btn-primary:hover,
+a.btn-primary:hover,
+button.btn-primary:hover {
+  background-color: #21867A;
+  color: #FFFFFF !important;
+  text-decoration: none !important;
 }
+
+.btn-secondary, a.btn-secondary, button.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary) !important;
+  border: 1px solid var(--color-primary);
+}
+
+.btn-secondary:hover,
+a.btn-secondary:hover,
+button.btn-secondary:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary) !important;
+  text-decoration: none !important;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #21867A;
+  text-decoration: underline;
+}
+
+a.btn:hover, a.btn-primary:hover, a.btn-secondary:hover {
+  text-decoration: none !important;
+}
+
 
 .input-group {
   margin-bottom: calc(var(--space-unit) * 4);
@@ -106,7 +144,7 @@ h1, h2, h3, h4 {
   font-family: var(--font-body);
   font-size: 1rem;
   color: var(--color-text-primary);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
   background-color: var(--color-surface);
 }
 
@@ -117,7 +155,43 @@ h1, h2, h3, h4 {
 
 .card {
   background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   padding: calc(var(--space-unit) * 8);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.file-upload-input::file-selector-button,
+.file-upload-input::-webkit-file-upload-button {
+  background-color: var(--color-primary);
+  color: #F8F9FA;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: calc(var(--space-unit) * 2) calc(var(--space-unit) * 4);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: calc(var(--space-unit) * 4);
+}
+
+.file-upload-input::file-selector-button:hover,
+.file-upload-input::-webkit-file-upload-button:hover {
+  background-color: #21867A;
+}
+
+body[data-theme="dark"] {
+  --color-background: #1A262D;
+  --color-surface: #264653;
+  --color-text-primary: #F4E9CD;
+  --color-text-secondary: #E9C46A;
+  --color-border: #3A6475;
+  --color-primary: #2A9D8F;
+  --color-primary-light: rgba(42, 157, 143, 0.2);
+  --color-primary-lighter: rgba(42, 157, 143, 0.15);
+  
+  background-color: var(--color-background) !important;
+  color: var(--color-text-primary) !important;
 }

@@ -1,80 +1,10 @@
 {% extends 'shared/base.html' %}
+{% load static %}
 
 {% block title %}Student Registration - Placement Portal{% endblock %}
 
 {% block extra_css %}
-<style>
-    body {
-        padding: calc(var(--space-unit) * 8) 0;
-        background-color: var(--color-background);
-    }
-    
-    .register-wrapper {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 0 calc(var(--space-unit) * 4);
-    }
-    
-    .register-header {
-        text-align: center;
-        margin-bottom: calc(var(--space-unit) * 6);
-    }
-    
-    .register-header h1 {
-        font-size: 2rem;
-        margin-bottom: calc(var(--space-unit) * 2);
-    }
-    
-    .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 calc(var(--space-unit) * 6);
-    }
-    
-    .form-section-title {
-        grid-column: 1 / -1;
-        font-family: var(--font-display);
-        font-size: 1.25rem;
-        color: var(--color-primary);
-        margin-top: calc(var(--space-unit) * 4);
-        margin-bottom: calc(var(--space-unit) * 4);
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: calc(var(--space-unit) * 2);
-    }
-    
-    .full-width {
-        grid-column: 1 / -1;
-    }
-    
-    .btn-submit {
-        width: 100%;
-        padding: calc(var(--space-unit) * 3);
-        font-size: 1rem;
-        margin-top: calc(var(--space-unit) * 4);
-    }
-    
-    .back-link {
-        display: block;
-        text-align: center;
-        margin-top: calc(var(--space-unit) * 6);
-        color: var(--color-text-secondary);
-        text-decoration: none;
-        font-weight: 500;
-        font-family: var(--font-body);
-    }
-    
-    .back-link:hover {
-        color: var(--color-primary);
-        text-decoration: underline;
-    }
-    
-    @media (max-width: 600px) {
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -122,9 +52,9 @@
                     <label for="department" class="input-label">Department *</label>
                     <select id="department" name="department" class="input-field" required>
                         <option value="" disabled selected>Select your department</option>
-                        <option value="1">Computer Engineering</option>
-                        <option value="2">Information Technology</option>
-                        <option value="3">Mechanical Engineering</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 
