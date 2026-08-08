@@ -11,15 +11,15 @@
 </div>
 
 <!-- Search & Filter Controls -->
-<div class="card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-    <form method="get" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
-        <div style="flex: 1; min-width: 220px;">
-            <label class="input-label" style="font-size: 0.85rem;">Search Candidate</label>
+<div class="card search-card">
+    <form method="get" class="search-form-flex">
+        <div class="search-field-main">
+            <label class="input-label drive-highlight-label">Search Candidate</label>
             <input type="text" name="q" value="{{ search_query }}" class="input-field" placeholder="Search name, roll number, email...">
         </div>
 
-        <div style="width: 200px;">
-            <label class="input-label" style="font-size: 0.85rem;">Filter by Drive</label>
+        <div class="search-field-drive">
+            <label class="input-label drive-highlight-label">Filter by Drive</label>
             <select name="drive" class="input-field">
                 <option value="">All Placement Drives</option>
                 {% for drive in drives %}
@@ -30,8 +30,8 @@
             </select>
         </div>
 
-        <div style="width: 180px;">
-            <label class="input-label" style="font-size: 0.85rem;">Filter by Status</label>
+        <div class="search-field-status">
+            <label class="input-label drive-highlight-label">Filter by Status</label>
             <select name="status" class="input-field">
                 <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
                 <option value="applied" {% if status_filter == 'applied' %}selected{% endif %}>Applied</option>
@@ -42,9 +42,9 @@
             </select>
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
+        <div class="btn-action-group">
             <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{% url 'company_portal:applicants_list' %}" class="btn btn-secondary" style="text-decoration: none;">Reset</a>
+            <a href="{% url 'company_portal:applicants_list' %}" class="btn btn-secondary">Reset</a>
         </div>
     </form>
 </div>
@@ -68,34 +68,34 @@
             {% for app in applications %}
             <tr>
                 <td>
-                    <div style="font-weight: 600; color: var(--color-text-primary);">{{ app.student.full_name }}</div>
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary);">{{ app.student.user.email }}</div>
+                    <div class="applicant-name-text">{{ app.student.full_name }}</div>
+                    <div class="applicant-sub-text">{{ app.student.user.email }}</div>
                 </td>
                 <td>{{ app.student.roll_number }}</td>
                 <td>
-                    <a href="{% url 'company_portal:drive_detail' app.drive.pk %}" style="font-weight: 500; color: var(--color-primary); text-decoration: none;">
+                    <a href="{% url 'company_portal:drive_detail' app.drive.pk %}" class="profile-website-link">
                         {{ app.drive.title }}
                     </a>
                 </td>
                 <td>{{ app.student.department.name }}</td>
-                <td style="font-weight: 600; color: var(--color-primary);">{{ app.student.cgpa }}</td>
+                <td class="drive-highlight-salary">{{ app.student.cgpa }}</td>
                 <td>
                     {% if app.student.resume %}
-                        <a href="{{ app.student.resume.url }}" target="_blank" class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;">
+                        <a href="{{ app.student.resume.url }}" target="_blank" class="btn btn-secondary resume-btn">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                             Resume
                         </a>
                     {% else %}
-                        <span style="color: var(--color-text-secondary); font-size: 0.82rem;">None</span>
+                        <span class="applicant-sub-text">None</span>
                     {% endif %}
                 </td>
                 <td>
                     <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
                 </td>
                 <td>
-                    <form method="post" action="{% url 'company_portal:update_application_status' app.pk %}" style="display: flex; gap: 0.5rem;">
+                    <form method="post" action="{% url 'company_portal:update_application_status' app.pk %}" class="btn-action-group">
                         {% csrf_token %}
-                        <select name="status" class="input-field" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; width: auto;" onchange="this.form.submit()">
+                        <select name="status" class="input-field status-select-input auto-submit-status">
                             <option value="applied" {% if app.status == 'applied' %}selected{% endif %}>Applied</option>
                             <option value="shortlisted" {% if app.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
                             <option value="interview_scheduled" {% if app.status == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
@@ -110,8 +110,8 @@
     </table>
 </div>
 {% else %}
-<div class="card" style="text-align: center; padding: 3rem 1.5rem; color: var(--color-text-secondary);">
-    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔍</div>
+<div class="card empty-state-box">
+    <div class="empty-state-icon">🔍</div>
     <h3>No applications found</h3>
     <p>No candidates match your search or filter parameters.</p>
 </div>

@@ -10,7 +10,7 @@
 
 {% block student_content %}
 <div class="profile-header">
-    <div style="display: flex; align-items: center; gap: 1.5rem;">
+    <div class="profile-hero-flex">
         {% if profile.profile_photo %}
             <div id="photoModalTrigger" class="profile-avatar-clickable">
                 <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
@@ -22,7 +22,7 @@
         {% endif %}
         <div>
             <h1>My Profile</h1>
-            <p style="color: var(--color-text-secondary);">View and manage your academic and personal information</p>
+            <p class="profile-hero-sub">View and manage your academic and personal information</p>
         </div>
     </div>
     <a href="{% url 'student_portal:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
@@ -63,7 +63,7 @@
             <span class="info-value">{{ profile.department.name }}</span>
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="info-grid-2col">
             <div class="info-row">
                 <span class="info-label">Current Semester</span>
                 <span class="info-value data-figure">{{ profile.semester }}</span>
@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="info-grid-2col">
             <div class="info-row">
                 <span class="info-label">Passing Year</span>
                 <span class="info-value data-figure">{{ profile.passing_year }}</span>
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Skills and Documents -->
-    <div class="profile-card" style="grid-column: 1 / -1;">
+    <div class="profile-card profile-card-full">
         <h3>Skills & Documents</h3>
         
         <div class="info-row">
@@ -98,20 +98,20 @@
                 {% for skill in profile.skills.all %}
                     <span class="skill-badge">{{ skill.name }}</span>
                 {% empty %}
-                    <span style="color: var(--color-text-secondary); font-size: 0.875rem;">No skills added yet.</span>
+                    <span class="text-muted-sm">No skills added yet.</span>
                 {% endfor %}
             </div>
         </div>
 
-        <div class="info-row" style="margin-top: 1rem;">
+        <div class="info-row info-row-spaced">
             <span class="info-label">Resume</span>
             <div class="resume-section">
                 {% if profile.resume %}
-                    <span style="font-weight: 500;">{{ profile.resume.name|cut:'resumes/' }}</span>
-                    <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem;">View / Download</a>
+                    <span class="text-medium">{{ profile.resume.name|cut:'resumes/' }}</span>
+                    <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-primary btn-sm-padding">View / Download</a>
                 {% else %}
-                    <span style="color: var(--color-text-secondary);">No resume uploaded yet.</span>
-                    <a href="{% url 'student_portal:edit_profile' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Upload Resume</a>
+                    <span class="profile-hero-sub">No resume uploaded yet.</span>
+                    <a href="{% url 'student_portal:edit_profile' %}" class="btn btn-primary btn-sm-padding">Upload Resume</a>
                 {% endif %}
             </div>
         </div>
@@ -121,7 +121,7 @@
 <!-- Photo Modal -->
 <div id="photoModal" class="photo-modal-overlay">
     {% if profile.profile_photo %}
-    <img src="{{ profile.profile_photo.url }}" class="photo-modal-img">
+    <img src="{{ profile.profile_photo.url }}" class="photo-modal-img" alt="Enlarged Profile Photo">
     {% endif %}
     <div id="photoModalClose" class="photo-modal-close">&times;</div>
 </div>

@@ -9,7 +9,7 @@
         <p>Define job responsibilities, compensation package, and student eligibility criteria.</p>
     </div>
     <div>
-        <a href="{% url 'company_portal:drives_list' %}" class="btn btn-secondary" style="text-decoration: none;">Back to Drives</a>
+        <a href="{% url 'company_portal:drives_list' %}" class="btn btn-secondary">Back to Drives</a>
     </div>
 </div>
 
@@ -22,7 +22,7 @@
                 <label for="id_title" class="input-label">Job Title / Designation *</label>
                 {{ form.title }}
                 {% if form.title.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.title.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.title.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -30,7 +30,7 @@
                 <label for="id_job_description" class="input-label">Job Description & Responsibilities *</label>
                 {{ form.job_description }}
                 {% if form.job_description.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.job_description.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.job_description.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -38,7 +38,7 @@
                 <label for="id_salary_package" class="input-label">Salary Package (LPA) *</label>
                 {{ form.salary_package }}
                 {% if form.salary_package.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.salary_package.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.salary_package.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -46,7 +46,7 @@
                 <label for="id_location" class="input-label">Job Location *</label>
                 {{ form.location }}
                 {% if form.location.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.location.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.location.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -54,7 +54,7 @@
                 <label for="id_min_cgpa" class="input-label">Minimum Required CGPA *</label>
                 {{ form.min_cgpa }}
                 {% if form.min_cgpa.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.min_cgpa.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.min_cgpa.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -62,7 +62,7 @@
                 <label for="id_max_backlogs" class="input-label">Maximum Allowed Backlogs *</label>
                 {{ form.max_backlogs }}
                 {% if form.max_backlogs.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.max_backlogs.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.max_backlogs.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -70,7 +70,7 @@
                 <label for="id_eligible_passing_year" class="input-label">Eligible Graduation Batch / Year *</label>
                 {{ form.eligible_passing_year }}
                 {% if form.eligible_passing_year.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.eligible_passing_year.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.eligible_passing_year.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -83,7 +83,7 @@
                 <label for="id_application_deadline" class="input-label">Application Deadline *</label>
                 {{ form.application_deadline }}
                 {% if form.application_deadline.errors %}
-                    <span style="color: red; font-size: 0.82rem;">{{ form.application_deadline.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.application_deadline.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -96,7 +96,7 @@
                 <label class="input-label">Eligible Departments *</label>
                 {{ form.eligible_departments }}
                 {% if form.eligible_departments.errors %}
-                    <span style="color: red; font-size: 0.82rem; display: block; margin-top: 0.25rem;">{{ form.eligible_departments.errors.0 }}</span>
+                    <span class="form-error-msg">{{ form.eligible_departments.errors.0 }}</span>
                 {% endif %}
             </div>
 
@@ -106,8 +106,8 @@
             </div>
         </div>
 
-        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-            <a href="{% url 'company_portal:drives_list' %}" class="btn btn-secondary" style="text-decoration: none;">Cancel</a>
+        <div class="form-actions-row">
+            <a href="{% url 'company_portal:drives_list' %}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Create Placement Drive</button>
         </div>
     </form>

@@ -13,13 +13,13 @@
     <!-- Top Navbar (Desktop & Mobile Header) -->
     <header class="top-navbar">
         <div class="navbar-brand">
-            <a href="{% url 'company_portal:profile' %}" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+            <a href="{% url 'company_portal:profile' %}" class="brand-link">
                 {% if user.companyprofile.logo %}
-                    <img src="{{ user.companyprofile.logo.url }}" alt="Company Logo" class="brand-avatar-img" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover;">
+                    <img src="{{ user.companyprofile.logo.url }}" alt="Company Logo" class="brand-avatar-img">
                 {% else %}
                     <div class="logo-square">{{ user.companyprofile.company_name|default:user.email|make_list|first|upper }}</div>
                 {% endif %}
-                <h2 class="brand-title" style="margin: 0; font-size: 1.15rem;">{{ user.companyprofile.company_name|default:user.email }}</h2>
+                <h2 class="brand-title brand-title-text">{{ user.companyprofile.company_name|default:user.email }}</h2>
             </a>
         </div>
 
@@ -79,8 +79,8 @@
             <a href="{% url 'company_portal:profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'edit_profile' %}active{% endif %}">Company Profile</a>
         </nav>
 
-        <div class="sidebar-footer" style="padding: 1.5rem;">
-            <div class="theme-switch-wrapper" style="margin-bottom: 1rem;">
+        <div class="sidebar-footer sidebar-footer-inner">
+            <div class="theme-switch-wrapper sidebar-theme-wrapper">
                 <label class="theme-btn-label">
                     <input type="checkbox" id="themeToggleCheckbox" class="theme-checkbox-hidden">
                     <span class="theme-btn-content">
@@ -89,7 +89,7 @@
                     </span>
                 </label>
             </div>
-            <a href="{% url 'accounts:login' %}" class="btn-logout-bordered" style="width: 100%; justify-content: center;">
+            <a href="{% url 'accounts:login' %}" class="btn-logout-bordered sidebar-logout-btn-full">
                 Log Out
             </a>
         </div>
@@ -107,4 +107,5 @@
 
 {% block extra_js %}
 <script src="{% static 'company_portal/js/sidebar.js' %}?v=2.0"></script>
+<script src="{% static 'company_portal/js/company_portal.js' %}?v=1.0"></script>
 {% endblock %}

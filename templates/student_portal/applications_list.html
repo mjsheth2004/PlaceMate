@@ -13,27 +13,27 @@
 <div class="applications-list-container">
     {% for app in applications %}
     <div class="card app-card-interactive">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div class="completion-header">
             
             <!-- Left Side: Company and Drive Info -->
-            <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <div class="app-company-info">
                 <div class="company-avatar-box lg">
                     {{ app.drive.company.company_name|make_list|first|upper }}
                 </div>
                 <div>
-                    <h3 style="margin: 0 0 0.25rem 0; color: var(--color-text-primary); font-size: 1.25rem;">{{ app.drive.title }}</h3>
-                    <p style="margin: 0; color: var(--color-text-secondary); font-size: 1rem; font-weight: 500;">
+                    <h3 class="drive-item-title mb-025">{{ app.drive.title }}</h3>
+                    <p class="company-name-heading font-normal">
                         {{ app.drive.company.company_name }} &bull; {{ app.drive.location }}
                     </p>
-                    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--color-text-secondary);">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <div class="file-name-text mt-05">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="align-middle mr-4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         Applied on: {{ app.applied_at|date:"d M Y, h:i A" }}
                     </div>
                 </div>
             </div>
 
             <!-- Right Side: Status and Action -->
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+            <div class="align-right-flex">
                 
                 {% if app.status == 'applied' %}
                     <span class="status-pill applied">
@@ -56,12 +56,12 @@
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Rejected
                     </span>
                 {% else %}
-                    <span style="background: var(--color-background); color: var(--color-text-secondary); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--color-border);">
+                    <span class="status-pill">
                         {{ app.status }}
                     </span>
                 {% endif %}
 
-                <a href="{% url 'student_portal:drive_detail' app.drive.id %}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Drive Details</a>
+                <a href="{% url 'student_portal:drive_detail' app.drive.id %}" class="btn btn-secondary btn-sm-padding">View Drive Details</a>
             </div>
         </div>
     </div>
@@ -72,7 +72,7 @@
         </div>
         <h3>No applications found</h3>
         <p>You haven't applied to any placement drives yet.</p>
-        <a href="{% url 'student_portal:drives_list' %}" class="btn btn-primary" style="margin-top: 1.5rem; text-decoration: none;">Browse Available Drives</a>
+        <a href="{% url 'student_portal:drives_list' %}" class="btn btn-primary mt-15">Browse Available Drives</a>
     </div>
     {% endfor %}
 </div>
