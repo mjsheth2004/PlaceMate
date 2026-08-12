@@ -1,0 +1,274 @@
+{% extends 'student_portal/base.html' %}
+{% load static %}
+
+{% block title %}Analytics & Performance - Student Portal - PlaceMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'student_portal/css/analytics.css' %}?v=1.0">
+{% endblock %}
+
+{% block student_content %}
+<div class="analytics-container">
+    <!-- Header Banner -->
+    <div class="analytics-header-card card">
+        <div class="header-left">
+            <div class="header-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                Career Intelligence
+            </div>
+            <h1 class="analytics-title">Student Placement Analytics</h1>
+            <p class="analytics-subtitle">Track your application pipeline, interview conversion rates, salary package tier distributions, and skill demand alignment.</p>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'student_portal:drives_list' %}" class="btn btn-primary btn-header-action">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                Explore Eligible Drives
+            </a>
+        </div>
+    </div>
+
+    <!-- Metrics Summary Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card card">
+            <div class="metric-icon icon-applied">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Applications Submitted</span>
+                <span class="metric-value data-figure">{{ total_applications }}</span>
+                <span class="metric-subtext">Across active drives</span>
+            </div>
+        </div>
+
+        <div class="metric-card card">
+            <div class="metric-icon icon-shortlisted">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Shortlist Rate</span>
+                <span class="metric-value data-figure">{{ shortlist_rate }}%</span>
+                <span class="metric-subtext">{{ shortlisted_count }} candidates shortlisted</span>
+            </div>
+        </div>
+
+        <div class="metric-card card">
+            <div class="metric-icon icon-interview">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Interviews Scheduled</span>
+                <span class="metric-value data-figure">{{ interview_count }}</span>
+                <span class="metric-subtext">Upcoming rounds</span>
+            </div>
+        </div>
+
+        <div class="metric-card card metric-accent">
+            <div class="metric-icon icon-selected">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Offer Conversion Rate</span>
+                <span class="metric-value data-figure">{{ offer_rate }}%</span>
+                <span class="metric-subtext">{{ selected_count }} offer letter(s) received</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Grid (2x2 Layout) -->
+    <div class="charts-grid">
+        <!-- Status Doughnut Chart -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Application Lifecycle Breakdown</h3>
+                    <p class="chart-subtitle">Distribution of your applications by current status</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Activity Timeline Line Chart -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Application Activity Trend</h3>
+                    <p class="chart-subtitle">Submission velocity over the last 6 months</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Salary Package Distribution Bar Chart -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Applied Salary Tiers</h3>
+                    <p class="chart-subtitle">Distribution of drives applied across LPA salary brackets</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="salaryChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Skill Demand Match Bar Chart -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Your Skill Demand Alignment</h3>
+                    <p class="chart-subtitle">Active placement drives requiring your listed skills</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="skillChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Insights & Recommended Drives Grid -->
+    <div class="details-grid">
+        <!-- Recent Applications Detailed Table -->
+        <div class="details-card card">
+            <div class="table-header-row">
+                <h3 class="section-title">Application Detailed Record</h3>
+                <a href="{% url 'student_portal:applications_list' %}" class="btn-link-sm">View All Applications &rarr;</a>
+            </div>
+            {% if recent_applications %}
+                <div class="table-responsive">
+                    <table class="analytics-table">
+                        <thead>
+                            <tr>
+                                <th>Company & Drive</th>
+                                <th>Package</th>
+                                <th>Applied Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in recent_applications %}
+                            <tr>
+                                <td>
+                                    <div class="table-company-cell">
+                                        {% if app.drive.company.logo %}
+                                            <img src="{{ app.drive.company.logo.url }}" alt="{{ app.drive.company.company_name }}" class="mini-logo">
+                                        {% else %}
+                                            <div class="mini-logo-placeholder">{{ app.drive.company.company_name|make_list|first|upper }}</div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="cell-primary-text">{{ app.drive.title }}</div>
+                                            <div class="cell-secondary-text">{{ app.drive.company.company_name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="data-figure cell-package">₹{{ app.drive.salary_package }} LPA</span></td>
+                                <td><span class="cell-date">{{ app.applied_at|date:"M d, Y" }}</span></td>
+                                <td>
+                                    {% if app.status == 'applied' %}
+                                        <span class="status-badge badge-applied">Applied</span>
+                                    {% elif app.status == 'shortlisted' %}
+                                        <span class="status-badge badge-shortlisted">Shortlisted</span>
+                                    {% elif app.status == 'interview_scheduled' %}
+                                        <span class="status-badge badge-interview">Interview</span>
+                                    {% elif app.status == 'selected' %}
+                                        <span class="status-badge badge-selected">Selected</span>
+                                    {% elif app.status == 'rejected' %}
+                                        <span class="status-badge badge-rejected">Rejected</span>
+                                    {% else %}
+                                        <span class="status-badge">{{ app.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'student_portal:drive_detail' app.drive.id %}" class="btn btn-secondary btn-sm-action">View Drive</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>No placement drive applications submitted yet.</p>
+                    <a href="{% url 'student_portal:drives_list' %}" class="btn btn-primary btn-sm">Browse Drives</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recommended Drives Sidebar Card -->
+        <div class="recommendations-card card">
+            <h3 class="section-title">Recommended Placement Drives</h3>
+            <p class="section-subtitle">Active drives matching your department, CGPA & passing year.</p>
+
+            {% if recommended_drives %}
+                <div class="recommendations-list">
+                    {% for drive in recommended_drives %}
+                    <div class="rec-drive-item">
+                        <div class="rec-item-header">
+                            <div class="rec-company-info">
+                                {% if drive.company.logo %}
+                                    <img src="{{ drive.company.logo.url }}" alt="{{ drive.company.company_name }}" class="mini-logo">
+                                {% else %}
+                                    <div class="mini-logo-placeholder">{{ drive.company.company_name|make_list|first|upper }}</div>
+                                {% endif %}
+                                <div>
+                                    <h4 class="rec-drive-title">{{ drive.title }}</h4>
+                                    <span class="rec-company-name">{{ drive.company.company_name }}</span>
+                                </div>
+                            </div>
+                            <span class="data-figure rec-package">₹{{ drive.salary_package }} LPA</span>
+                        </div>
+                        <div class="rec-item-footer">
+                            <span class="rec-deadline">Deadline: {{ drive.application_deadline|date:"M d" }}</span>
+                            <a href="{% url 'student_portal:drive_detail' drive.id %}" class="btn btn-primary btn-xs">Apply Now</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>You have applied to all currently eligible active drives!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Embedded JSON Data for Chart.js -->
+<script id="status-data" type="application/json">{{ status_chart_json|safe }}</script>
+<script id="salary-data" type="application/json">{{ salary_tier_json|safe }}</script>
+<script id="timeline-data" type="application/json">{{ timeline_json|safe }}</script>
+<script id="skill-data" type="application/json">{{ skill_data_json|safe }}</script>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'student_portal/js/analytics.js' %}?v=1.0"></script>
+{% endblock %}

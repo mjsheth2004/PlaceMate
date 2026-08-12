@@ -8,4 +8,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // File input label display update for company logo
+    const logoInput = document.getElementById('id_logo');
+    const logoName = document.getElementById('logo-file-name');
+    if (logoInput && logoName) {
+        logoInput.addEventListener('change', function () {
+            if (this.files && this.files.length > 0) {
+                logoName.textContent = this.files[0].name;
+            } else {
+                logoName.textContent = 'No file chosen';
+            }
+        });
+    }
 });

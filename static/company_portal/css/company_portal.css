@@ -5,6 +5,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding-top: 0.5rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -15,6 +16,8 @@
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 0.25rem 0;
+  line-height: 1.25;
+  padding-top: 4px;
 }
 
 .cp-page-header p {
@@ -567,3 +570,34 @@
   margin: 0;
   border: none;
 }
+
+/* File Upload Button Styling (matching student portal) */
+.upload-btn-item {
+  width: 220px;
+  max-width: 100%;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.file-name-text {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-top: 8px;
+  text-align: left;
+  word-break: break-all;
+}
+
+.btn-block {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  display: block;
+  text-decoration: none;
+}
+
+.display-none {
+  display: none !important;
+}
+

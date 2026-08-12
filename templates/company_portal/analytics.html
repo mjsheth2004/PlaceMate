@@ -1,0 +1,227 @@
+{% extends 'company_portal/base.html' %}
+{% load static %}
+
+{% block title %}Recruitment Analytics - Company Portal - PlaceMate{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'company_portal/css/analytics.css' %}?v=1.0">
+{% endblock %}
+
+{% block company_content %}
+<div class="analytics-container">
+    <!-- Header Banner -->
+    <div class="analytics-header-card card">
+        <div class="header-left">
+            <div class="header-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                Recruiter Intelligence
+            </div>
+            <h1 class="analytics-title">{{ company_profile.company_name }} Recruitment Analytics</h1>
+            <p class="analytics-subtitle">Track drive conversion performance, candidate pool quality metrics, academic CGPA spread, and stage-by-stage recruitment funnel progression.</p>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'company_portal:create_drive' %}" class="btn btn-primary btn-header-action">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Post New Placement Drive
+            </a>
+        </div>
+    </div>
+
+    <!-- Metrics Summary Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card card">
+            <div class="metric-icon icon-drives">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Total Applications Received</span>
+                <span class="metric-value data-figure">{{ total_applicants_count }}</span>
+                <span class="metric-subtext">Across {{ published_drives_count }} published drive(s)</span>
+            </div>
+        </div>
+
+        <div class="metric-card card">
+            <div class="metric-icon icon-shortlist">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Shortlist Conversion</span>
+                <span class="metric-value data-figure">{{ shortlist_rate }}%</span>
+                <span class="metric-subtext">{{ shortlisted_count }} candidates shortlisted</span>
+            </div>
+        </div>
+
+        <div class="metric-card card">
+            <div class="metric-icon icon-selection">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Selection / Hire Rate</span>
+                <span class="metric-value data-figure">{{ selection_rate }}%</span>
+                <span class="metric-subtext">{{ selected_count }} candidates hired</span>
+            </div>
+        </div>
+
+        <div class="metric-card card metric-accent">
+            <div class="metric-icon icon-cgpa">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+            </div>
+            <div class="metric-body">
+                <span class="metric-label">Average Applicant CGPA</span>
+                <span class="metric-value data-figure">{{ avg_cgpa }}</span>
+                <span class="metric-subtext">Avg {{ avg_applicants_per_drive }} applicants per drive</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Charts Grid (2x2) -->
+    <div class="charts-grid">
+        <!-- Recruitment Pipeline Funnel Chart -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Recruitment Pipeline Funnel</h3>
+                    <p class="chart-subtitle">Applicant counts by application stage</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Drive Comparison Chart -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Drive Comparative Performance</h3>
+                    <p class="chart-subtitle">Applicants vs Hires across posted drives</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="driveCompChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Departmental Applicant Split -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Applicant Department Split</h3>
+                    <p class="chart-subtitle">Distribution of candidates by academic branch</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Candidate CGPA Distribution -->
+        <div class="chart-card card">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Candidate Academic CGPA Spread</h3>
+                    <p class="chart-subtitle">Count of applicants binned by CGPA range</p>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="cgpaChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drive Performance Summary Table -->
+    <div class="details-card card">
+        <div class="table-header-row">
+            <div>
+                <h3 class="section-title">Drive Performance Breakdown</h3>
+                <p class="section-subtitle">Detailed analytics and conversion rates per placement drive</p>
+            </div>
+            <a href="{% url 'company_portal:drives_list' %}" class="btn-link-sm">Manage Placement Drives &rarr;</a>
+        </div>
+        {% if drives_summary %}
+            <div class="table-responsive">
+                <table class="analytics-table">
+                    <thead>
+                        <tr>
+                            <th>Drive Title</th>
+                            <th>Status</th>
+                            <th>Total Applicants</th>
+                            <th>Shortlisted</th>
+                            <th>Hired</th>
+                            <th>Avg CGPA</th>
+                            <th>Hire Rate</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in drives_summary %}
+                        <tr>
+                            <td>
+                                <div class="cell-primary-text">{{ item.drive.title }}</div>
+                                <div class="cell-secondary-text">₹{{ item.drive.salary_package }} LPA • {{ item.drive.location }}</div>
+                            </td>
+                            <td>
+                                {% if item.drive.status == 'published' %}
+                                    <span class="status-badge badge-published">Published</span>
+                                {% elif item.drive.status == 'draft' %}
+                                    <span class="status-badge badge-draft">Draft</span>
+                                {% else %}
+                                    <span class="status-badge badge-closed">Closed</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="data-figure">{{ item.total_applicants }}</span></td>
+                            <td><span class="data-figure">{{ item.shortlisted_count }}</span></td>
+                            <td><span class="data-figure text-success-highlight">{{ item.selected_count }}</span></td>
+                            <td><span class="data-figure">{{ item.avg_cgpa }}</span></td>
+                            <td><span class="data-figure cell-rate">{{ item.hire_rate }}%</span></td>
+                            <td>
+                                <div class="action-btn-group">
+                                    <a href="{% url 'company_portal:drive_detail' item.drive.id %}" class="btn btn-secondary btn-sm-action">Drive Details</a>
+                                    <a href="{% url 'company_portal:applicants_list' %}?drive={{ item.drive.id }}" class="btn btn-primary btn-sm-action">Applicants</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>No placement drives created yet.</p>
+                <a href="{% url 'company_portal:create_drive' %}" class="btn btn-primary btn-sm">Create First Drive</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Embedded JSON Data for Chart.js -->
+<script id="funnel-data" type="application/json">{{ funnel_chart_json|safe }}</script>
+<script id="drive-comp-data" type="application/json">{{ drive_comparison_json|safe }}</script>
+<script id="dept-data" type="application/json">{{ dept_chart_json|safe }}</script>
+<script id="cgpa-data" type="application/json">{{ cgpa_chart_json|safe }}</script>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'company_portal/js/analytics.js' %}?v=1.0"></script>
+{% endblock %}

@@ -19,6 +19,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+admin.site.site_header = "PlaceMate Administration"
+admin.site.site_title = "PlaceMate Admin Portal"
+admin.site.index_title = "Placement Management Dashboard & Database Tables"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.accounts.urls')),

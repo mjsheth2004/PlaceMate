@@ -42,13 +42,22 @@
             </div>
 
             <div class="input-group form-group-full">
-                <label for="id_logo" class="input-label">Company Logo (Image File)</label>
-                {{ form.logo }}
-                {% if company_profile.logo %}
-                    <div class="recent-item-sub">
-                        Current logo: <a href="{{ company_profile.logo.url }}" target="_blank">View File</a>
+                <label for="{{ form.logo.id_for_label }}" class="input-label">Company Logo (Image File)</label>
+                <div class="upload-btn-item">
+                    <label for="{{ form.logo.id_for_label }}" class="btn btn-primary btn-block">
+                        Upload Company Logo
+                    </label>
+                    <div class="display-none" style="display: none;">
+                        {{ form.logo }}
                     </div>
-                {% endif %}
+                    <span id="logo-file-name" class="file-name-text">No file chosen</span>
+
+                    {% if company_profile.logo %}
+                    <p class="file-name-text">
+                        Current logo: <a href="{{ company_profile.logo.url }}" target="_blank">View File</a>
+                    </p>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="input-group form-group-full">

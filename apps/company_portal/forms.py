@@ -12,7 +12,7 @@ class CompanyProfileForm(forms.ModelForm):
             'website': forms.URLInput(attrs={'class': 'input-field', 'placeholder': 'https://example.com'}),
             'location': forms.TextInput(attrs={'class': 'input-field', 'placeholder': 'e.g. Bengaluru, India'}),
             'description': forms.Textarea(attrs={'class': 'input-field', 'rows': 4, 'placeholder': 'Brief description of your company...'}),
-            'logo': forms.FileInput(attrs={'class': 'input-field-file'}),
+            'logo': forms.FileInput(attrs={'class': 'file-upload-input'}),
         }
 
 class PlacementDriveForm(forms.ModelForm):

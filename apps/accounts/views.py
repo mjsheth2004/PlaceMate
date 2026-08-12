@@ -27,6 +27,9 @@ def login_redirect_view(request):
 def register_selection_view(request):
     return render(request, 'accounts/register_selection.html')
 
+def presentation_view(request):
+    return render(request, 'presentation.html')
+
 def register_student_view(request):
     # Ensure default departments exist so the form doesn't fail
     if not Department.objects.exists():

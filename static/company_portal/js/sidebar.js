@@ -4,10 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
     function toggleSidebar() {
-        if (sidebar && sidebarOverlay) {
-            sidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('active');
-        }
+        if (sidebar) sidebar.classList.toggle('open');
+        if (sidebarOverlay) sidebarOverlay.classList.toggle('active');
     }
 
     if (sidebarToggle) {
@@ -20,27 +18,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const themeCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="themeToggle"]');
     
-    // Check for saved theme preference or use system preference
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            themeCheckboxes.forEach(cb => cb.checked = true);
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.body.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            themeCheckboxes.forEach(cb => cb.checked = false);
+        }
+        
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: theme } }));
+    }
+
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
     
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        document.body.setAttribute('data-theme', 'dark');
-        themeCheckboxes.forEach(cb => cb.checked = true);
-    }
+    applyTheme(initialTheme);
 
     themeCheckboxes.forEach(themeCheckbox => {
         themeCheckbox.addEventListener('change', function() {
             const isDark = this.checked;
-            themeCheckboxes.forEach(cb => cb.checked = isDark);
-            
-            if (isDark) {
-                document.body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
-            }
+            applyTheme(isDark ? 'dark' : 'light');
         });
     });
 });

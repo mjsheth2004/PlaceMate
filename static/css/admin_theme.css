@@ -1,0 +1,368 @@
+/* PlaceMate Django Admin Theme
+   Aligned with 06_Design.md and theme.css
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Default (Light Theme) */
+:root, html[data-theme="light"], body[data-theme="light"] {
+  --color-primary: #2A9D8F;
+  --color-accent: #E9C46A;
+  --color-terracotta: #E76F51;
+
+  --color-primary-light: rgba(42, 157, 143, 0.08);
+  --color-primary-lighter: rgba(42, 157, 143, 0.05);
+
+  --color-background: #FDFBF7;
+  --color-surface: #FFFFFF;
+  --color-card-bg: #FFFFFF;
+  --color-text-primary: #264653;
+  --color-text-secondary: #8A6D3B;
+  --color-border: #E9C46A;
+
+  --status-applied: #2A9D8F;
+  --status-shortlisted: #E9C46A;
+  --status-interview: #E76F51;
+  --status-selected: #2A9D8F;
+  --status-rejected: #E76F51;
+
+  --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.08);
+
+  --admin-header-bg: #FFFFFF;
+  --admin-table-header-bg: #F9F6F0;
+  --admin-table-row-alt: #FBF9F4;
+  --admin-table-hover: rgba(42, 157, 143, 0.06);
+  --admin-link-color: #2A9D8F;
+  --admin-link-hover: #1f7a6e;
+}
+
+/* Dark Theme */
+html[data-theme="dark"], body[data-theme="dark"] {
+  --color-background: #1A262D;
+  --color-surface: #264653;
+  --color-card-bg: #264653;
+  --color-text-primary: #F4E9CD;
+  --color-text-secondary: #E9C46A;
+  --color-border: #3A6475;
+  --color-primary: #2A9D8F;
+  --color-accent: #E9C46A;
+
+  --color-primary-light: rgba(42, 157, 143, 0.25);
+  --color-primary-lighter: rgba(42, 157, 143, 0.18);
+
+  --admin-header-bg: #264653;
+  --admin-table-header-bg: #1D353F;
+  --admin-table-row-alt: #203B46;
+  --admin-table-hover: rgba(42, 157, 143, 0.2);
+  --admin-link-color: #E9C46A;
+  --admin-link-hover: #f3d489;
+}
+
+/* Hide Django's built-in theme toggle icon */
+.theme-toggle, button.theme-toggle, #header .theme-toggle {
+  display: none !important;
+}
+
+/* Global Reset for Admin Body */
+html, body {
+  background-color: var(--color-background) !important;
+  color: var(--color-text-primary) !important;
+  font-family: var(--font-body) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#container {
+  background-color: var(--color-background) !important;
+}
+
+/* Admin Header */
+#header {
+  background: var(--color-surface) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  padding: 1rem 1.5rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+#header a:link, #header a:visited {
+  color: var(--admin-link-color) !important;
+  font-weight: 500 !important;
+}
+
+#header a:hover {
+  color: var(--admin-link-hover) !important;
+  text-decoration: underline !important;
+}
+
+#site-name a {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  font-size: 1.35rem !important;
+  color: var(--color-primary) !important;
+  text-decoration: none !important;
+}
+
+#user-tools {
+  font-family: var(--font-body) !important;
+  font-size: 0.85rem !important;
+  color: var(--color-text-secondary) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+#user-tools a {
+  border-bottom: 1px dashed var(--color-border) !important;
+  text-decoration: none !important;
+}
+
+/* Breadcrumbs */
+div.breadcrumbs {
+  background: var(--color-surface) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.85rem !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+div.breadcrumbs a {
+  color: var(--admin-link-color) !important;
+  font-weight: 600 !important;
+}
+
+/* Admin Modules / Cards */
+.module {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: 1.5rem !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.module h2, .module caption, caption {
+  background: var(--color-primary-lighter) !important;
+  color: var(--color-primary) !important;
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.02em !important;
+  padding: 0.85rem 1.25rem !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.module p, .module li {
+  color: var(--color-text-primary) !important;
+}
+
+.module table a {
+  color: var(--admin-link-color) !important;
+  font-weight: 500 !important;
+}
+
+/* Tables */
+table {
+  background: var(--color-surface) !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+thead th {
+  background: var(--admin-table-header-bg) !important;
+  color: var(--color-text-secondary) !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: 0.75rem 1rem !important;
+}
+
+thead th a {
+  color: var(--color-text-secondary) !important;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: var(--color-surface) !important;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--admin-table-row-alt) !important;
+}
+
+tbody tr:hover {
+  background-color: var(--admin-table-hover) !important;
+}
+
+tbody td, tbody th {
+  padding: 0.75rem 1rem !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.9rem !important;
+}
+
+td a, th a {
+  color: var(--admin-link-color) !important;
+}
+
+/* Form Fields & Controls */
+input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], textarea, select {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--color-text-primary) !important;
+  padding: 0.5rem 0.75rem !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.9rem !important;
+}
+
+input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--color-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--color-primary-light) !important;
+}
+
+/* Buttons */
+.button, input[type=submit], input[type=button], .submit-row input {
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.5rem 1.25rem !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+}
+
+.button:hover, input[type=submit]:hover, .submit-row input:hover {
+  background: #1f7a6e !important;
+}
+
+.button.deletelink, a.deletelink {
+  background: var(--status-rejected) !important;
+  color: #ffffff !important;
+}
+
+.button.deletelink:hover, a.deletelink:hover {
+  background: #c95337 !important;
+}
+
+/* Filters sidebar */
+#changelist-filter {
+  background: var(--color-surface) !important;
+  border-left: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  margin-left: 15px !important;
+}
+
+#changelist-filter h2 {
+  background: var(--color-primary-lighter) !important;
+  color: var(--color-primary) !important;
+  font-family: var(--font-display) !important;
+}
+
+#changelist-filter h3 {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.85rem !important;
+}
+
+#changelist-filter a {
+  color: var(--color-text-primary) !important;
+}
+
+#changelist-filter li.selected a {
+  color: var(--color-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Change list toolbar */
+#toolbar {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.75rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Object tools button */
+.object-tools a {
+  background: var(--color-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+}
+
+.object-tools a:hover {
+  background: #1f7a6e !important;
+}
+
+/* Custom Theme Switcher Button (Matching Student/Company Portal) */
+.theme-switch-wrapper.admin-theme-switch {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.theme-checkbox-hidden {
+  display: none !important;
+}
+
+.theme-btn-label {
+  cursor: pointer;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-btn-label:hover {
+  background-color: var(--color-background);
+}
+
+.theme-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.theme-checkbox-hidden:not(:checked) + .theme-btn-content .theme-icon:before {
+  content: "🌙";
+}
+
+.theme-checkbox-hidden:not(:checked) + .theme-btn-content .theme-text:before {
+  content: "Dark Mode";
+}
+
+.theme-checkbox-hidden:checked + .theme-btn-content .theme-icon:before {
+  content: "☀️";
+}
+
+.theme-checkbox-hidden:checked + .theme-btn-content .theme-text:before {
+  content: "Light Mode";
+}

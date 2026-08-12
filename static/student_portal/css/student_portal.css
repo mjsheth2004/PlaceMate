@@ -67,6 +67,7 @@
 /* Dashboard Header & KPI Metrics */
 .sp-page-header {
     margin-bottom: calc(var(--space-unit) * 6);
+    padding-top: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -74,7 +75,10 @@
     gap: 1rem;
 }
 .sp-page-header h1 {
+    margin-top: 0;
     margin-bottom: 0.25rem;
+    line-height: 1.25;
+    padding-top: 4px;
 }
 .sp-page-header p {
     color: var(--color-text-secondary);
@@ -224,6 +228,7 @@
     border: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
+    padding: 1.5rem;
 }
 .card-header-row {
     padding-bottom: 1rem;
@@ -357,7 +362,7 @@
 
 /* Application List Items */
 .application-row {
-    padding: 1.25rem 0;
+    padding: 1rem 0.5rem;
     border-bottom: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;

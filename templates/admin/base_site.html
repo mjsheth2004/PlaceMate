@@ -1,0 +1,82 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+    (function() {
+        var savedTheme = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    })();
+</script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/admin_theme.css' %}?v=2.2">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeCheckbox = document.getElementById('themeToggleAdmin');
+        
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                if (themeCheckbox) themeCheckbox.checked = true;
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.body.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                if (themeCheckbox) themeCheckbox.checked = false;
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+        
+        applyTheme(initialTheme);
+
+        if (themeCheckbox) {
+            themeCheckbox.addEventListener('change', function() {
+                applyTheme(this.checked ? 'dark' : 'light');
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🚀 {{ site_header|default:_('Django administration') }}
+    </a>
+</div>
+{% endblock %}
+
+{% block userlinks %}
+    {% if site_url %}
+        <a href="{{ site_url }}">{% translate 'View site' %}</a> /
+    {% endif %}
+    {% if user.is_active and user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+    {% endif %}
+    {% if user.has_permission %}
+        <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
+    {% endif %}
+    <div class="theme-switch-wrapper admin-theme-switch">
+        <label class="theme-btn-label">
+            <input type="checkbox" id="themeToggleAdmin" class="theme-checkbox-hidden">
+            <span class="theme-btn-content">
+                <span class="theme-icon"></span>
+                <span class="theme-text"></span>
+            </span>
+        </label>
+    </div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
