@@ -259,3 +259,122 @@ def applications_list_view(request):
     return render(request, 'student_portal/applications_list.html', {
         'applications': applications
     })
+
+import json
+from datetime import datetime
+from django.db.models import Count, Q
+from apps.common.models import Skill
+
+@login_required
+def analytics_view(request):
+    try:
+        profile = request.user.studentprofile
+    except Exception:
+        return redirect('student_portal:profile')
+
+    now = timezone.now()
+    applications = Application.objects.filter(student=profile).select_related('drive', 'drive__company')
+    total_applications = applications.count()
+    
+    applied_count = applications.filter(status='applied').count()
+    shortlisted_count = applications.filter(status='shortlisted').count()
+    interview_count = applications.filter(status='interview_scheduled').count()
+    selected_count = applications.filter(status='selected').count()
+    rejected_count = applications.filter(status='rejected').count()
+
+    shortlist_rate = round(((shortlisted_count + interview_count + selected_count) / total_applications * 100), 1) if total_applications > 0 else 0
+    offer_rate = round((selected_count / total_applications * 100), 1) if total_applications > 0 else 0
+
+    # 1. Status Chart JSON
+    status_chart_json = json.dumps({
+        'labels': ['Applied', 'Shortlisted', 'Interview Scheduled', 'Selected', 'Rejected'],
+        'data': [applied_count, shortlisted_count, interview_count, selected_count, rejected_count]
+    })
+
+    # 2. Salary Tier Distribution of applied drives
+    salary_tiers = {'< 6 LPA': 0, '6 - 10 LPA': 0, '10 - 15 LPA': 0, '15+ LPA': 0}
+    for app in applications:
+        try:
+            pkg = float(app.drive.salary_package)
+            if pkg < 6.0:
+                salary_tiers['< 6 LPA'] += 1
+            elif pkg <= 10.0:
+                salary_tiers['6 - 10 LPA'] += 1
+            elif pkg <= 15.0:
+                salary_tiers['10 - 15 LPA'] += 1
+            else:
+                salary_tiers['15+ LPA'] += 1
+        except (ValueError, TypeError):
+            salary_tiers['< 6 LPA'] += 1
+
+    salary_tier_json = json.dumps({
+        'labels': list(salary_tiers.keys()),
+        'data': list(salary_tiers.values())
+    })
+
+    # 3. Application Activity Timeline (last 6 months)
+    month_labels = []
+    month_counts = []
+    for i in range(5, -1, -1):
+        year = now.year
+        month = now.month - i
+        while month <= 0:
+            month += 12
+            year -= 1
+        m_name = datetime(year, month, 1).strftime('%b %Y')
+        month_labels.append(m_name)
+        m_count = applications.filter(applied_at__year=year, applied_at__month=month).count()
+        month_counts.append(m_count)
+
+    timeline_json = json.dumps({
+        'labels': month_labels,
+        'data': month_counts
+    })
+
+    # 4. Skill Demand Alignment
+    student_skills = profile.skills.all()
+    skill_labels = []
+    skill_data = []
+    if student_skills.exists():
+        for sk in student_skills[:8]:
+            d_count = PlacementDrive.objects.filter(status='published', required_skills=sk).count()
+            skill_labels.append(sk.name)
+            skill_data.append(d_count)
+    else:
+        top_skills = Skill.objects.annotate(drive_count=Count('placementdrive', filter=Q(placementdrive__status='published'))).order_by('-drive_count')[:6]
+        for sk in top_skills:
+            skill_labels.append(sk.name)
+            skill_data.append(sk.drive_count)
+
+    skill_data_json = json.dumps({
+        'labels': skill_labels,
+        'data': skill_data
+    })
+
+    recent_applications = applications.order_by('-applied_at')[:8]
+    applied_drive_ids = applications.values_list('drive_id', flat=True)
+    recommended_drives = PlacementDrive.objects.filter(
+        status='published',
+        application_deadline__gt=now,
+        eligible_departments=profile.department_id,
+        min_cgpa__lte=profile.cgpa or 0.0,
+        max_backlogs__gte=profile.active_backlogs or 0,
+        eligible_passing_year=profile.passing_year or 0
+    ).exclude(id__in=applied_drive_ids).select_related('company').order_by('application_deadline')[:5]
+
+    context = {
+        'total_applications': total_applications,
+        'shortlisted_count': shortlisted_count,
+        'shortlist_rate': shortlist_rate,
+        'interview_count': interview_count,
+        'selected_count': selected_count,
+        'offer_rate': offer_rate,
+        'status_chart_json': status_chart_json,
+        'salary_tier_json': salary_tier_json,
+        'timeline_json': timeline_json,
+        'skill_data_json': skill_data_json,
+        'recent_applications': recent_applications,
+        'recommended_drives': recommended_drives,
+    }
+    return render(request, 'student_portal/analytics.html', context)
+

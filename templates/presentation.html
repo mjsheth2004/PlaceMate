@@ -692,7 +692,7 @@
 
                 <div class="card">
                     <div class="card-title">Page Templates</div>
-                    <p class="card-desc">Child templates (`dashboard.html`, `drives_list.html`) fill specific `{% block content %}` blocks with semantic HTML5 elements.</p>
+                    <p class="card-desc">Child templates (`dashboard.html`, `drives_list.html`) fill specific `{% verbatim %}{% block content %}{% endverbatim %}` blocks with semantic HTML5 elements.</p>
                 </div>
             </div>
         </div>
@@ -889,7 +889,7 @@ send_mail(
             <div class="grid-4">
                 <div class="card">
                     <div class="card-title">CSRF Protection</div>
-                    <p class="card-desc">`{% csrf_token %}` injection on all form POST submissions to prevent cross-site request forgery.</p>
+                    <p class="card-desc">`{% verbatim %}{% csrf_token %}{% endverbatim %}` injection on all form POST submissions to prevent cross-site request forgery.</p>
                 </div>
 
                 <div class="card">

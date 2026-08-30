@@ -4,7 +4,7 @@
 {% block title %}Company Registration - Placement Portal{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/register.css' %}">
+<link rel="stylesheet" href="{% static 'css/register.css' %}?v=2.1">
 {% endblock %}
 
 {% block content %}
@@ -22,13 +22,40 @@
                 <h3 class="form-section-title">Account Information</h3>
                 
                 <div class="input-group">
-                    <label for="email" class="input-label">HR / Contact Email *</label>
-                    <input type="email" id="email" name="email" class="input-field" required>
+                    <label for="email" class="input-label">HR / Contact Email * <span id="resendTimerText" class="resend-timer-text"></span></label>
+                    <div class="email-input-group">
+                        <input type="email" id="email" name="email" class="input-field" placeholder="recruiter@company.com" required>
+                        <button type="button" id="btnSendOtp" class="btn btn-primary btn-otp-send">Send OTP</button>
+                    </div>
+                    <div id="emailVerifiedBadge" class="email-verified-badge" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Email Verified
+                    </div>
                 </div>
                 
                 <div class="input-group">
                     <label for="password" class="input-label">Password *</label>
-                    <input type="password" id="password" name="password" class="input-field" required>
+                    <input type="password" id="password" name="password" class="input-field" placeholder="e.g. Pass1234" minlength="8" required>
+                    <div class="password-help-text">
+                        🔒 Min 8 chars, 1 uppercase letter, combination of letters & numbers
+                    </div>
+                </div>
+
+                <!-- OTP Verification Box (Hidden by default, shown only when OTP is requested) -->
+                <div id="otpSection" class="otp-verification-box" style="display: none;">
+                    <div class="otp-header-row">
+                        <div>
+                            <div class="otp-box-title">Enter Verification Code</div>
+                            <p class="otp-instruction">We sent a 6-digit code to your email. Enter it below:</p>
+                        </div>
+                    </div>
+                    <div class="otp-inputs-row">
+                        <input type="text" id="otpCodeInput" maxlength="6" class="input-field otp-code-input data-figure" placeholder="000000" autocomplete="one-time-code">
+                        <button type="button" id="btnVerifyOtp" class="btn btn-primary btn-otp-verify">Verify OTP</button>
+                    </div>
+                    <div id="otpMessage" class="otp-feedback-msg"></div>
                 </div>
                 
                 <h3 class="form-section-title">Company Profile</h3>
@@ -66,3 +93,9 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/otp_register.js' %}?v=2.1"></script>
+{% endblock %}
+

@@ -15,4 +15,7 @@ urlpatterns = [
     
     # Applications
     path('applications/', views.applications_list_view, name='applications_list'),
+    
+    # Analytics & Intelligence
+    path('analytics/', views.analytics_view, name='analytics'),
 ]

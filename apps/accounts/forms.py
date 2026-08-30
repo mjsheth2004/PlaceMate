@@ -1,8 +1,20 @@
+import re
 from django import forms
 from apps.accounts.models import User
 from apps.student_portal.models import StudentProfile
 from apps.company_portal.models import CompanyProfile
 from apps.common.models import Department
+
+def validate_password_strength(password):
+    if not password or len(password) < 8:
+        raise forms.ValidationError("Password must be at least 8 characters long.")
+    if not re.search(r'[A-Z]', password):
+        raise forms.ValidationError("Password must contain at least 1 capital letter (A-Z).")
+    if not re.search(r'[a-zA-Z]', password):
+        raise forms.ValidationError("Password must contain alphabetic letters.")
+    if not re.search(r'\d', password):
+        raise forms.ValidationError("Password must be a combination of alphabets and numbers (must include at least 1 number).")
+    return password
 
 class StudentRegistrationForm(forms.Form):
     email = forms.EmailField()
@@ -22,11 +34,18 @@ class StudentRegistrationForm(forms.Form):
             raise forms.ValidationError("Email already registered.")
         return email
 
-    def clean_roll_number(self):
-        roll_number = self.cleaned_data.get('roll_number')
-        if StudentProfile.objects.filter(roll_number=roll_number).exists():
-            raise forms.ValidationError("Roll number already registered.")
-        return roll_number
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        return validate_password_strength(password)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        roll_number = cleaned_data.get('roll_number')
+        department = cleaned_data.get('department')
+        if roll_number and department:
+            if StudentProfile.objects.filter(department=department, roll_number=roll_number).exists():
+                self.add_error('roll_number', f"Roll number '{roll_number}' is already registered in {department.name}.")
+        return cleaned_data
 
 class CompanyRegistrationForm(forms.Form):
     email = forms.EmailField()
@@ -42,3 +61,8 @@ class CompanyRegistrationForm(forms.Form):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already registered.")
         return email
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        return validate_password_strength(password)
+

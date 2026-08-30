@@ -11,6 +11,8 @@ urlpatterns = [
     path('presentation/', views.presentation_view, name='presentation'),
     path('register/student/', views.register_student_view, name='register_student'),
     path('register/company/', views.register_company_view, name='register_company'),
+    path('send-otp/', views.send_registration_otp_view, name='send_otp'),
+    path('verify-otp/', views.verify_registration_otp_view, name='verify_otp'),
     path('forgot-password/', auth_views.PasswordResetView.as_view(
         template_name='accounts/forgot_password.html',
         email_template_name='registration/password_reset_email.html',

@@ -13,4 +13,5 @@ urlpatterns = [
     path('drives/<int:pk>/edit/', views.edit_drive_view, name='edit_drive'),
     path('applicants/', views.applicants_list_view, name='applicants_list'),
     path('application/<int:pk>/status/', views.update_application_status_view, name='update_application_status'),
+    path('analytics/', views.analytics_view, name='analytics'),
 ]

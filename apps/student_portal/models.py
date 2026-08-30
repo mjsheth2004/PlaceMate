@@ -7,7 +7,7 @@ from apps.common.models import Department, Skill
 class StudentProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
-    roll_number = models.CharField(max_length=50, unique=True)
+    roll_number = models.CharField(max_length=50)
     university = models.CharField(max_length=255)
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     semester = models.PositiveSmallIntegerField()
@@ -24,6 +24,11 @@ class StudentProfile(models.Model):
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['department', 'roll_number'], name='unique_department_roll_number')
+        ]
 
     def __str__(self):
         return f"{self.full_name} ({self.roll_number})"

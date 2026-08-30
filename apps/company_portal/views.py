@@ -264,3 +264,128 @@ def update_application_status_view(request, pk):
             
     next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or redirect('company_portal:applicants_list').url
     return redirect(next_url)
+
+
+import json
+from django.db.models import Avg
+
+@company_required
+def analytics_view(request):
+    company_profile, created = CompanyProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'company_name': request.user.first_name or request.user.email}
+    )
+    
+    drives = PlacementDrive.objects.filter(company=company_profile)
+    total_drives_count = drives.count()
+    published_drives_count = drives.filter(status='published').count()
+    
+    applications = Application.objects.filter(drive__company=company_profile).select_related('student', 'student__department', 'student__user', 'drive')
+    total_applicants_count = applications.count()
+    
+    applied_count = applications.filter(status='applied').count()
+    shortlisted_count = applications.filter(status='shortlisted').count()
+    interview_count = applications.filter(status='interview_scheduled').count()
+    selected_count = applications.filter(status='selected').count()
+    rejected_count = applications.filter(status='rejected').count()
+    
+    shortlist_rate = round(((shortlisted_count + interview_count + selected_count) / total_applicants_count * 100), 1) if total_applicants_count > 0 else 0
+    selection_rate = round((selected_count / total_applicants_count * 100), 1) if total_applicants_count > 0 else 0
+    
+    avg_cgpa_val = applications.aggregate(Avg('student__cgpa'))['student__cgpa__avg']
+    avg_cgpa = round(avg_cgpa_val, 2) if avg_cgpa_val is not None else 0.0
+    
+    avg_applicants_per_drive = round(total_applicants_count / total_drives_count, 1) if total_drives_count > 0 else 0
+
+    # 1. Funnel Chart JSON
+    funnel_chart_json = json.dumps({
+        'labels': ['Applied', 'Shortlisted', 'Interview Scheduled', 'Selected (Hired)', 'Rejected'],
+        'data': [applied_count, shortlisted_count, interview_count, selected_count, rejected_count]
+    })
+
+    # 2. Drive Comparison Chart (Applicants vs Hires per drive)
+    drive_labels = []
+    drive_applicants = []
+    drive_hires = []
+    for d in drives.order_by('-created_at')[:6]:
+        drive_labels.append(d.title[:18] + ('...' if len(d.title) > 18 else ''))
+        drive_applicants.append(d.application_set.count())
+        drive_hires.append(d.application_set.filter(status='selected').count())
+        
+    drive_comparison_json = json.dumps({
+        'labels': drive_labels,
+        'applicants': drive_applicants,
+        'hires': drive_hires
+    })
+
+    # 3. Department Split Chart
+    dept_map = {}
+    for app in applications:
+        dept_name = app.student.department.name if app.student.department else 'Other'
+        dept_map[dept_name] = dept_map.get(dept_name, 0) + 1
+        
+    dept_chart_json = json.dumps({
+        'labels': list(dept_map.keys()) if dept_map else ['No Applicants'],
+        'data': list(dept_map.values()) if dept_map else [0]
+    })
+
+    # 4. Candidate CGPA Spread
+    cgpa_bins = {'< 6.0': 0, '6.0 - 7.0': 0, '7.0 - 8.0': 0, '8.0 - 9.0': 0, '9.0 - 10.0': 0}
+    for app in applications:
+        try:
+            cgpa_val = float(app.student.cgpa or 0)
+            if cgpa_val < 6.0:
+                cgpa_bins['< 6.0'] += 1
+            elif cgpa_val < 7.0:
+                cgpa_bins['6.0 - 7.0'] += 1
+            elif cgpa_val < 8.0:
+                cgpa_bins['7.0 - 8.0'] += 1
+            elif cgpa_val < 9.0:
+                cgpa_bins['8.0 - 9.0'] += 1
+            else:
+                cgpa_bins['9.0 - 10.0'] += 1
+        except (ValueError, TypeError):
+            cgpa_bins['< 6.0'] += 1
+
+    cgpa_chart_json = json.dumps({
+        'labels': list(cgpa_bins.keys()),
+        'data': list(cgpa_bins.values())
+    })
+
+    # Detailed Drive Performance Breakdown Table
+    drives_summary = []
+    for d in drives.order_by('-created_at'):
+        d_apps = d.application_set.all()
+        d_total = d_apps.count()
+        d_short = d_apps.filter(status='shortlisted').count()
+        d_selected = d_apps.filter(status='selected').count()
+        d_avg_cgpa = d_apps.aggregate(Avg('student__cgpa'))['student__cgpa__avg']
+        d_hire_rate = round(d_selected / d_total * 100, 1) if d_total > 0 else 0
+        
+        drives_summary.append({
+            'drive': d,
+            'total_applicants': d_total,
+            'shortlisted_count': d_short,
+            'selected_count': d_selected,
+            'avg_cgpa': round(d_avg_cgpa, 2) if d_avg_cgpa is not None else 'N/A',
+            'hire_rate': d_hire_rate
+        })
+
+    context = {
+        'company_profile': company_profile,
+        'published_drives_count': published_drives_count,
+        'total_applicants_count': total_applicants_count,
+        'shortlisted_count': shortlisted_count,
+        'selected_count': selected_count,
+        'shortlist_rate': shortlist_rate,
+        'selection_rate': selection_rate,
+        'avg_cgpa': avg_cgpa,
+        'avg_applicants_per_drive': avg_applicants_per_drive,
+        'funnel_chart_json': funnel_chart_json,
+        'drive_comparison_json': drive_comparison_json,
+        'dept_chart_json': dept_chart_json,
+        'cgpa_chart_json': cgpa_chart_json,
+        'drives_summary': drives_summary,
+    }
+    return render(request, 'company_portal/analytics.html', context)
+

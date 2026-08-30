@@ -54,3 +54,21 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+from django.utils import timezone
+
+class EmailOTP(models.Model):
+    email = models.EmailField(db_index=True)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def is_valid(self):
+        return (timezone.now() - self.created_at).total_seconds() < 600
+
+    def __str__(self):
+        return f"OTP for {self.email} - Verified: {self.is_verified}"
