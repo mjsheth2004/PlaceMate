@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from .models import StudentProfile, Application
 
 @admin.register(StudentProfile)
@@ -31,8 +32,8 @@ class StudentProfileAdmin(admin.ModelAdmin):
     @admin.display(ordering='is_verified', description='Status')
     def verified_badge(self, obj):
         if obj.is_verified:
-            return format_html('<span style="background-color: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">Verified</span>')
-        return format_html('<span style="background-color: #ffc107; color: #212529; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">Pending</span>')
+            return mark_safe('<span style="background-color: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">Verified</span>')
+        return mark_safe('<span style="background-color: #ffc107; color: #212529; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">Pending</span>')
 
     @admin.action(description="Verify selected student profiles")
     def verify_students(self, request, queryset):

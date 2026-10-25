@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.conf import settings
 from .models import Application
 from apps.common.models import PlacementDrive
@@ -217,7 +219,16 @@ def apply_for_drive_view(request, drive_id):
     
     # Send Confirmation Email
     subject = f"Application Received: {drive.company.company_name} - {drive.title}"
-    message = f"""Hi {profile.full_name or request.user.username},
+    student_name = profile.full_name or request.user.username or request.user.email
+    applications_url = request.build_absolute_uri(reverse('student_portal:applications_list'))
+
+    html_message = render_to_string('emails/application_confirmation.html', {
+        'student_name': student_name,
+        'drive': drive,
+        'applications_url': applications_url,
+    })
+
+    message = f"""Hi {student_name},
 
 You have successfully applied for the {drive.title} role at {drive.company.company_name}.
 
@@ -225,12 +236,10 @@ Drive Details:
 - Role: {drive.title}
 - Company: {drive.company.company_name}
 - Location: {drive.location}
-- Package: {drive.salary_package}
+- Package: ₹{drive.salary_package} LPA
 
-Description:
-{drive.job_description}
-
-You can track the status of your application in the "My Applications" section of your PlaceMate portal.
+You can track the status of your application in the "My Applications" section of your PlaceMate portal:
+{applications_url}
 
 Best of luck!
 The PlaceMate Team
@@ -241,6 +250,7 @@ The PlaceMate Team
             message,
             settings.DEFAULT_FROM_EMAIL,
             [request.user.email],
+            html_message=html_message,
             fail_silently=True,
         )
     except Exception as e:

@@ -9,6 +9,7 @@ Rename that file to just .env. (Note: This file is already ignored in .gitignore
 Paste your Neon.tech Connection String into that file like this:
 env
 DATABASE_URL="postgresql://your_neon_url_here"
+   (Note for Supabase: Use the Connection Pooler URL with session mode on port 5432, as direct connections only support IPv6 and may cause connection timeouts on networks without IPv6).
 Step 3: Apply the Database
 Run these commands in your terminal to install the new PostgreSQL libraries and set up the tables on the live database:
 

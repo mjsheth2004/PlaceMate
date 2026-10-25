@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+    const initialTheme = (savedTheme === 'dark') ? 'dark' : 'light';
     
     applyTheme(initialTheme);
 

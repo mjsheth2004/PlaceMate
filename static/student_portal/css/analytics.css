@@ -5,6 +5,11 @@
     flex-direction: column;
     gap: calc(var(--space-unit) * 6);
     padding: calc(var(--space-unit) * 2) 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* Header Card */
@@ -15,10 +20,13 @@
     background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-muted) 100%);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: calc(var(--space-unit) * 7) calc(var(--space-unit) * 8);
+    padding: calc(var(--space-unit) * 6) calc(var(--space-unit) * 6);
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .header-left {
@@ -72,20 +80,27 @@
 /* Metrics Grid */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: calc(var(--space-unit) * 4);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .metric-card {
     display: flex;
     align-items: center;
-    gap: calc(var(--space-unit) * 4);
-    padding: calc(var(--space-unit) * 5) calc(var(--space-unit) * 6);
+    gap: calc(var(--space-unit) * 3);
+    padding: calc(var(--space-unit) * 4) calc(var(--space-unit) * 5);
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .metric-card:hover {
@@ -159,18 +174,26 @@
 /* Charts Grid */
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: calc(var(--space-unit) * 5);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .chart-card {
     display: flex;
     flex-direction: column;
-    padding: calc(var(--space-unit) * 6);
+    padding: calc(var(--space-unit) * 5);
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .chart-header {
@@ -178,6 +201,7 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: calc(var(--space-unit) * 4);
+    min-width: 0;
 }
 
 .chart-title {
@@ -198,31 +222,49 @@
 .chart-wrapper {
     position: relative;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     height: 260px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
+}
+
+.chart-wrapper canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
 }
 
 /* Details & Recommendations Grid */
 .details-grid {
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
     gap: calc(var(--space-unit) * 5);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .details-card, .recommendations-card {
-    padding: calc(var(--space-unit) * 6);
+    padding: calc(var(--space-unit) * 5);
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .table-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: calc(var(--space-unit) * 4);
+}
     margin-bottom: calc(var(--space-unit) * 4);
 }
 
@@ -464,23 +506,23 @@
 /* Responsive Overrides */
 @media (max-width: 1200px) {
     .details-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
 @media (max-width: 1024px) {
     .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     
     .charts-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
 @media (max-width: 640px) {
     .metrics-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
     
     .analytics-header-card {

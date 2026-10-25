@@ -4,10 +4,11 @@
 {% block title %}Log In - Placement Portal{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<link rel="stylesheet" href="{% static 'css/auth.css' %}?v=3.4">
 {% endblock %}
 
 {% block content %}
+{% include 'accounts/auth_header.html' %}
 <div class="login-wrapper">
     <div class="card login-card">
         <div class="login-header">

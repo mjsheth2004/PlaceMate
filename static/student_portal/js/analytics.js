@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 50,
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 50,
                 scales: {
                     x: {
                         grid: { color: colors.gridColor },
@@ -155,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 50,
                 scales: {
                     x: {
                         grid: { display: false },
@@ -192,6 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 50,
                 scales: {
                     x: {
                         beginAtZero: true,

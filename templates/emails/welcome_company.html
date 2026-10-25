@@ -2,37 +2,48 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to PlaceMate Recruiter Portal!</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; }
-        .header { text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 20px; }
-        .header h1 { color: #58a6ff; font-size: 24px; margin: 0; }
-        .content { line-height: 1.6; font-size: 15px; }
-        .btn { display: inline-block; background-color: #238636; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
-        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #8b949e; border-top: 1px solid #30363d; padding-top: 15px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #ffffff !important; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 30px; color: #ffffff !important; }
+        .header { text-align: center; border-bottom: 1px solid #1f2937; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { color: #38bdf8 !important; font-size: 24px; margin: 0; }
+        .content { line-height: 1.6; font-size: 15px; color: #ffffff !important; }
+        .content p { color: #ffffff !important; }
+        .content li { color: #ffffff !important; }
+        .btn { display: inline-block; background-color: #16a34a; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #94a3b8 !important; border-top: 1px solid #1f2937; padding-top: 15px; }
+        .footer p { color: #94a3b8 !important; margin: 0; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Welcome to PlaceMate! 🏢</h1>
-        </div>
-        <div class="content">
-            <p>Hi {{ company_name }},</p>
-            <p>Welcome to <strong>PlaceMate</strong>! Your recruiter account has been created successfully.</p>
-            <p>With your Company account, you can:</p>
-            <ul>
-                <li>Post campus recruitment drives with specific eligibility criteria.</li>
-                <li>Review student applications and download candidate resumes.</li>
-                <li>Update candidate application statuses (Shortlist, Interview, Select/Reject).</li>
-            </ul>
-            <div style="text-align: center;">
-                <a href="{{ login_url }}" class="btn">Recruiter Dashboard</a>
-            </div>
-        </div>
-        <div class="footer">
-            <p>&copy; PlaceMate Campus Placement System. All rights reserved.</p>
-        </div>
-    </div>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #ffffff !important; margin: 0; padding: 20px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0b0f19;">
+        <tr>
+            <td align="center">
+                <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 30px; text-align: left; color: #ffffff !important;">
+                    <div class="header" style="text-align: center; border-bottom: 1px solid #1f2937; padding-bottom: 20px; margin-bottom: 20px;">
+                        <h1 style="color: #38bdf8 !important; font-size: 24px; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Welcome to PlaceMate! 🏢</h1>
+                    </div>
+                    <div class="content" style="line-height: 1.6; font-size: 15px; color: #ffffff !important;">
+                        <p style="color: #ffffff !important; margin: 0 0 16px 0; font-size: 15px; line-height: 1.6;">Hi <strong style="color: #ffffff !important;">{{ company_name }}</strong>,</p>
+                        <p style="color: #ffffff !important; margin: 0 0 16px 0; font-size: 15px; line-height: 1.6;">Welcome to <strong style="color: #ffffff !important;">PlaceMate</strong>! Your recruiter account has been created successfully.</p>
+                        <p style="color: #ffffff !important; margin: 0 0 12px 0; font-size: 15px; line-height: 1.6;">With your Company account, you can:</p>
+                        <ul style="color: #ffffff !important; padding-left: 20px; margin: 0 0 24px 0; line-height: 1.6;">
+                            <li style="color: #ffffff !important; margin-bottom: 10px; font-size: 15px;">Post campus recruitment drives with specific eligibility criteria.</li>
+                            <li style="color: #ffffff !important; margin-bottom: 10px; font-size: 15px;">Review student applications and download candidate resumes.</li>
+                            <li style="color: #ffffff !important; margin-bottom: 10px; font-size: 15px;">Update candidate application statuses (Shortlist, Interview, Select/Reject).</li>
+                        </ul>
+                        <div style="text-align: center; margin-top: 25px;">
+                            <a href="{{ login_url }}" class="btn" style="display: inline-block; background-color: #16a34a; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 15px;">Recruiter Dashboard</a>
+                        </div>
+                    </div>
+                    <div class="footer" style="text-align: center; margin-top: 30px; font-size: 12px; color: #94a3b8 !important; border-top: 1px solid #1f2937; padding-top: 15px;">
+                        <p style="color: #94a3b8 !important; margin: 0; font-size: 12px;">&copy; PlaceMate Campus Placement System. All rights reserved.</p>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

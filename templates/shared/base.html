@@ -6,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Placement Management Portal{% endblock %}</title>
     
-    <!-- Zero-flicker Theme Initialization -->
+    <!-- Zero-flicker Theme Initialization (Defaults to Light Mode) -->
     <script>
         (function() {
             var savedTheme = localStorage.getItem('theme');
-            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
             } else {
                 document.documentElement.setAttribute('data-theme', 'light');
@@ -25,7 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- Design System CSS -->
-    <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=2.2">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=3.3">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -45,6 +44,8 @@
         {% endblock %}
     </div>
     
+    <!-- Global Theme Switcher Logic -->
+    <script src="{% static 'js/theme_toggle.js' %}?v=3.3"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

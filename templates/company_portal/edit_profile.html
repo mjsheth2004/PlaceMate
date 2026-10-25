@@ -3,73 +3,75 @@
 {% block title %}Edit Company Profile - PlaceMate{% endblock %}
 
 {% block company_content %}
-<div class="cp-page-header">
-    <div>
-        <h1>Edit Company Profile</h1>
-        <p>Update your branding, industry, headquarters, and organization bio.</p>
+<div class="profile-page-wrapper" style="max-width: 900px;">
+    <div class="cp-page-header">
+        <div>
+            <h1>Edit Company Profile</h1>
+            <p>Update your branding, industry, headquarters, and organization bio.</p>
+        </div>
+        <div>
+            <a href="{% url 'company_portal:profile' %}" class="btn btn-secondary">Cancel</a>
+        </div>
     </div>
-    <div>
-        <a href="{% url 'company_portal:profile' %}" class="btn btn-secondary">Cancel</a>
-    </div>
-</div>
 
-<div class="card">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <div class="form-grid">
-            <div class="input-group">
-                <label for="id_company_name" class="input-label">Company Name *</label>
-                {{ form.company_name }}
-                {% if form.company_name.errors %}
-                    <span class="form-error-msg">{{ form.company_name.errors.0 }}</span>
-                {% endif %}
-            </div>
-
-            <div class="input-group">
-                <label for="id_industry" class="input-label">Industry / Sector</label>
-                {{ form.industry }}
-            </div>
-
-            <div class="input-group">
-                <label for="id_website" class="input-label">Website URL</label>
-                {{ form.website }}
-            </div>
-
-            <div class="input-group">
-                <label for="id_location" class="input-label">Location / Headquarters</label>
-                {{ form.location }}
-            </div>
-
-            <div class="input-group form-group-full">
-                <label for="{{ form.logo.id_for_label }}" class="input-label">Company Logo (Image File)</label>
-                <div class="upload-btn-item">
-                    <label for="{{ form.logo.id_for_label }}" class="btn btn-primary btn-block">
-                        Upload Company Logo
-                    </label>
-                    <div class="display-none" style="display: none;">
-                        {{ form.logo }}
-                    </div>
-                    <span id="logo-file-name" class="file-name-text">No file chosen</span>
-
-                    {% if company_profile.logo %}
-                    <p class="file-name-text">
-                        Current logo: <a href="{{ company_profile.logo.url }}" target="_blank">View File</a>
-                    </p>
+    <div class="card" style="padding: 2.75rem 2.5rem; border-radius: var(--radius-lg, 16px); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="id_company_name" class="input-label">Company Name *</label>
+                    {{ form.company_name }}
+                    {% if form.company_name.errors %}
+                        <span class="form-error-msg">{{ form.company_name.errors.0 }}</span>
                     {% endif %}
+                </div>
+
+                <div class="input-group">
+                    <label for="id_industry" class="input-label">Industry / Sector</label>
+                    {{ form.industry }}
+                </div>
+
+                <div class="input-group">
+                    <label for="id_website" class="input-label">Website URL</label>
+                    {{ form.website }}
+                </div>
+
+                <div class="input-group">
+                    <label for="id_location" class="input-label">Location / Headquarters</label>
+                    {{ form.location }}
+                </div>
+
+                <div class="input-group form-group-full">
+                    <label for="{{ form.logo.id_for_label }}" class="input-label">Company Logo (Image File)</label>
+                    <div class="upload-btn-item">
+                        <label for="{{ form.logo.id_for_label }}" class="btn btn-primary btn-block">
+                            Upload Company Logo
+                        </label>
+                        <div class="display-none" style="display: none;">
+                            {{ form.logo }}
+                        </div>
+                        <span id="logo-file-name" class="file-name-text">No file chosen</span>
+
+                        {% if company_profile.logo %}
+                        <p class="file-name-text" style="margin-top: 0.5rem;">
+                            Current logo: <a href="{{ company_profile.logo.url }}" target="_blank">View File</a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="input-group form-group-full">
+                    <label for="id_description" class="input-label">Company Description &amp; Bio</label>
+                    {{ form.description }}
                 </div>
             </div>
 
-            <div class="input-group form-group-full">
-                <label for="id_description" class="input-label">Company Description & Bio</label>
-                {{ form.description }}
+            <div class="form-actions-row" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
+                <a href="{% url 'company_portal:profile' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Profile Changes</button>
             </div>
-        </div>
-
-        <div class="form-actions-row">
-            <a href="{% url 'company_portal:profile' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Save Profile Changes</button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}

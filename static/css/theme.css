@@ -39,6 +39,7 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
+  --border-radius: 10px;
   --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
   --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.08);
 
@@ -67,11 +68,13 @@ html[data-theme="dark"], body[data-theme="dark"] {
   --status-rejected-bg: rgba(231, 111, 81, 0.25);
 }
 
-/* Global Reset & Theme Application */
+/* Global Reset & Theme Application - Zero Horizontal Scroll Guarantee */
 html {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden !important;
+  max-width: 100%;
 }
 
 body {
@@ -84,10 +87,35 @@ body {
   padding: 0;
   box-sizing: border-box;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  width: 100%;
+  position: relative;
 }
 
 *, *::before, *::after {
-  box-sizing: inherit;
+  box-sizing: border-box;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  max-width: 100%;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -284,5 +312,118 @@ a.btn:hover, a.btn-primary:hover, a.btn-secondary:hover {
 
 .display-none {
   display: none !important;
+}
+
+/* ============================================================
+   Global Theme Switcher Component (Design System)
+   ============================================================ */
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.theme-checkbox-hidden {
+  display: none;
+}
+
+.theme-btn-label {
+  cursor: pointer;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-btn-label:hover {
+  background-color: var(--color-background);
+}
+
+.theme-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.theme-checkbox-hidden:not(:checked) + .theme-btn-content .theme-icon:before {
+  content: "🌙";
+}
+
+.theme-checkbox-hidden:not(:checked) + .theme-btn-content .theme-text:before {
+  content: "Dark Mode";
+}
+
+.theme-checkbox-hidden:checked + .theme-btn-content .theme-icon:before {
+  content: "☀️";
+}
+
+.theme-checkbox-hidden:checked + .theme-btn-content .theme-text:before {
+  content: "Light Mode";
+}
+
+/* ============================================================
+   Integrated Auth Topbar (Login, Register, Forgot Password)
+   ============================================================ */
+.auth-topbar {
+  width: 100%;
+  max-width: 100%;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  z-index: 100;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.auth-topbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.auth-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none !important;
+  color: var(--color-text-primary) !important;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+}
+
+.auth-brand-badge {
+  background-color: var(--color-primary);
+  color: #ffffff !important;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(42, 157, 143, 0.25);
+}
+
+.auth-topbar-brand:hover .auth-brand-text {
+  color: var(--color-primary) !important;
+}
+
+.auth-brand-text {
+  transition: color 0.2s ease;
 }
 

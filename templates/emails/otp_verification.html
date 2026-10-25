@@ -10,57 +10,60 @@
             background-color: #f4f6f8;
             margin: 0;
             padding: 24px;
-            color: #264653;
+            color: #000000 !important;
         }
         .email-card {
             max-width: 520px;
             margin: 0 auto;
-            background: #ffffff;
+            background-color: #ffffff;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d5db;
         }
         .email-header {
-            background: linear-gradient(135deg, #264653 0%, #2a9d8f 100%);
+            background-color: #0f172a;
             padding: 28px 24px;
             text-align: center;
-            color: #ffffff;
+            color: #ffffff !important;
         }
         .email-header h1 {
             margin: 0;
             font-size: 24px;
             font-weight: 700;
             letter-spacing: 0.5px;
+            color: #ffffff !important;
         }
         .email-header p {
             margin: 6px 0 0 0;
             font-size: 13px;
-            color: #e9c46a;
-            font-weight: 500;
+            color: #38bdf8 !important;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .email-body {
             padding: 32px 28px;
             text-align: center;
+            background-color: #ffffff;
+            color: #000000 !important;
         }
         .greeting {
-            font-size: 16px;
-            color: #2d3748;
+            font-size: 18px;
+            color: #000000 !important;
             margin-bottom: 12px;
-            font-weight: 600;
+            font-weight: 700;
         }
         .message-text {
             font-size: 14px;
-            color: #4a5568;
+            color: #000000 !important;
             line-height: 1.6;
             margin-bottom: 24px;
         }
         .otp-box {
             display: inline-block;
-            background: #f8fafc;
-            border: 2px dashed #2a9d8f;
+            background-color: #f8fafc;
+            border: 2px dashed #0f172a;
             border-radius: 10px;
             padding: 16px 36px;
             margin: 8px 0 24px 0;
@@ -70,55 +73,66 @@
             font-size: 34px;
             font-weight: 800;
             letter-spacing: 8px;
-            color: #2a9d8f;
+            color: #000000 !important;
         }
         .otp-expiry {
             font-size: 13px;
-            color: #e76f51;
-            font-weight: 600;
+            color: #dc2626 !important;
+            font-weight: 700;
             margin-bottom: 16px;
         }
         .security-notice {
             font-size: 12px;
-            color: #718096;
-            background: #f7fafc;
+            color: #000000 !important;
+            background-color: #f1f5f9;
             padding: 12px;
             border-radius: 6px;
-            border-left: 3px solid #cbd5e0;
+            border-left: 4px solid #64748b;
             text-align: left;
             margin-top: 20px;
+            line-height: 1.5;
+        }
+        .security-notice strong {
+            color: #000000 !important;
         }
         .email-footer {
-            background: #edf2f7;
+            background-color: #f8fafc;
             padding: 16px;
             text-align: center;
             font-size: 12px;
-            color: #a0aec0;
+            color: #000000 !important;
+            border-top: 1px solid #e2e8f0;
         }
     </style>
 </head>
-<body>
-    <div class="email-card">
-        <div class="email-header">
-            <h1>PlaceMate</h1>
-            <p>Smart Campus Placement Portal</p>
-        </div>
-        <div class="email-body">
-            <div class="greeting">Email Verification Code</div>
-            <p class="message-text">
-                Thank you for registering on PlaceMate. To complete your registration and verify your email address, please enter the one-time verification code below:
-            </p>
-            <div class="otp-box">
-                <div class="otp-code">{{ otp }}</div>
-            </div>
-            <div class="otp-expiry">⏱ This code is valid for 10 minutes.</div>
-            <div class="security-notice">
-                🔒 <strong>Security Warning:</strong> Never share this OTP with anyone. PlaceMate administrators or recruiters will never ask you for your verification code.
-            </div>
-        </div>
-        <div class="email-footer">
-            &copy; PlaceMate Campus Placement System. All rights reserved.
-        </div>
-    </div>
+<body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 24px; color: #000000 !important;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f6f8;">
+        <tr>
+            <td align="center">
+                <div class="email-card" style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #d1d5db; text-align: left;">
+                    <div class="email-header" style="background-color: #0f172a; padding: 28px 24px; text-align: center; color: #ffffff !important;">
+                        <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff !important; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">PlaceMate</h1>
+                        <p style="margin: 6px 0 0 0; font-size: 13px; color: #38bdf8 !important; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Smart Campus Placement Portal</p>
+                    </div>
+                    <div class="email-body" style="padding: 32px 28px; text-align: center; background-color: #ffffff; color: #000000 !important;">
+                        <div class="greeting" style="font-size: 18px; color: #000000 !important; margin-bottom: 12px; font-weight: 700;">Email Verification Code</div>
+                        <p class="message-text" style="font-size: 14px; color: #000000 !important; line-height: 1.6; margin: 0 0 24px 0;">
+                            Thank you for registering on PlaceMate. To complete your registration and verify your email address, please enter the one-time verification code below:
+                        </p>
+                        <div class="otp-box" style="display: inline-block; background-color: #f8fafc; border: 2px dashed #0f172a; border-radius: 10px; padding: 16px 36px; margin: 8px 0 24px 0;">
+                            <div class="otp-code" style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #000000 !important;">{{ otp }}</div>
+                        </div>
+                        <div class="otp-expiry" style="font-size: 13px; color: #dc2626 !important; font-weight: 700; margin-bottom: 16px;">⏱ This code is valid for 10 minutes.</div>
+                        <div class="security-notice" style="font-size: 12px; color: #000000 !important; background-color: #f1f5f9; padding: 12px; border-radius: 6px; border-left: 4px solid #64748b; text-align: left; margin-top: 20px; line-height: 1.5;">
+                            🔒 <strong style="color: #000000 !important;">Security Warning:</strong> Never share this OTP with anyone. PlaceMate administrators or recruiters will never ask you for your verification code.
+                        </div>
+                    </div>
+                    <div class="email-footer" style="background-color: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #000000 !important; border-top: 1px solid #e2e8f0;">
+                        <p style="margin: 0; color: #000000 !important; font-size: 12px;">&copy; PlaceMate Campus Placement System. All rights reserved.</p>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

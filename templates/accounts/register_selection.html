@@ -4,10 +4,11 @@
 {% block title %}Register - Placement Portal{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/register_selection.css' %}">
+<link rel="stylesheet" href="{% static 'css/register_selection.css' %}?v=3.4">
 {% endblock %}
 
 {% block content %}
+{% include 'accounts/auth_header.html' %}
 <div class="selection-wrapper">
     <div class="selection-header">
         <h1>Create an Account</h1>

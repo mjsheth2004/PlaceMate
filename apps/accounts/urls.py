@@ -16,6 +16,8 @@ urlpatterns = [
     path('forgot-password/', auth_views.PasswordResetView.as_view(
         template_name='accounts/forgot_password.html',
         email_template_name='registration/password_reset_email.html',
+        html_email_template_name='emails/password_reset.html',
+        subject_template_name='registration/password_reset_subject.txt',
         success_url=reverse_lazy('accounts:password_reset_done')
     ), name='forgot_password'),
     path('forgot-password/done/', auth_views.PasswordResetDoneView.as_view(

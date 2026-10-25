@@ -62,11 +62,13 @@ def profile_view(request):
         defaults={'company_name': request.user.first_name or request.user.email}
     )
     drives_count = PlacementDrive.objects.filter(company=company_profile).count()
+    active_drives_count = PlacementDrive.objects.filter(company=company_profile, status='published').count()
     applications_count = Application.objects.filter(drive__company=company_profile).count()
     
     context = {
         'company_profile': company_profile,
         'drives_count': drives_count,
+        'active_drives_count': active_drives_count,
         'applications_count': applications_count,
     }
     return render(request, 'company_portal/profile.html', context)
