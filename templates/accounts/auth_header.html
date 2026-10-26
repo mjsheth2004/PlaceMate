@@ -1,19 +1,10 @@
 {% load static %}
-<header class="auth-topbar">
-    <div class="auth-topbar-inner">
-        <a href="{% url 'accounts:login' %}" class="auth-topbar-brand" title="PlaceMate Placement Portal">
-            <span class="auth-brand-badge">PM</span>
-            <span class="auth-brand-text">PlaceMate</span>
-        </a>
-
-        <div class="theme-switch-wrapper">
-            <label class="theme-btn-label" title="Toggle color theme">
-                <input type="checkbox" id="themeToggleCheckboxAuth" class="theme-checkbox-hidden">
-                <span class="theme-btn-content">
-                    <span class="theme-icon"></span>
-                    <span class="theme-text"></span>
-                </span>
-            </label>
-        </div>
-    </div>
-</header>
+<div class="auth-theme-toggle-container theme-switch-wrapper">
+    <label class="theme-btn-label" title="Toggle color theme">
+        <input type="checkbox" id="themeToggleCheckboxAuth" class="theme-checkbox-hidden">
+        <span class="theme-btn-content">
+            <span class="theme-icon"></span>
+            <span class="theme-text"></span>
+        </span>
+    </label>
+</div>

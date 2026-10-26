@@ -370,60 +370,35 @@ a.btn:hover, a.btn-primary:hover, a.btn-secondary:hover {
 }
 
 /* ============================================================
-   Integrated Auth Topbar (Login, Register, Forgot Password)
+   Floating Auth Theme Switcher (Bottom-Left)
    ============================================================ */
-.auth-topbar {
-  width: 100%;
-  max-width: 100%;
+.auth-theme-toggle-container {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.auth-theme-toggle-container .theme-btn-label {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
   background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  position: relative;
-  z-index: 100;
-  box-sizing: border-box;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.auth-topbar-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0.85rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-sizing: border-box;
+.auth-theme-toggle-container .theme-btn-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
-.auth-topbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none !important;
-  color: var(--color-text-primary) !important;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.2rem;
-  letter-spacing: -0.01em;
+@media (max-width: 576px) {
+  .auth-theme-toggle-container {
+    bottom: 1rem;
+    left: 1rem;
+  }
 }
 
-.auth-brand-badge {
-  background-color: var(--color-primary);
-  color: #ffffff !important;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 6px rgba(42, 157, 143, 0.25);
-}
-
-.auth-topbar-brand:hover .auth-brand-text {
-  color: var(--color-primary) !important;
-}
-
-.auth-brand-text {
-  transition: color 0.2s ease;
-}
 
