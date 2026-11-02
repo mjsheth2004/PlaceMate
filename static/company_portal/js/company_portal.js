@@ -3,7 +3,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const autoSubmitSelects = document.querySelectorAll('.auto-submit-status');
     autoSubmitSelects.forEach(function (select) {
         select.addEventListener('change', function () {
-            if (this.form) {
+            if (this.form && !this.form.dataset.submitting) {
+                this.form.dataset.submitting = 'true';
+                this.form.style.opacity = '0.6';
+                this.form.style.pointerEvents = 'none';
                 this.form.submit();
             }
         });

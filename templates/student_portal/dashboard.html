@@ -83,7 +83,344 @@
 </div>
 {% endif %}
 
+<!-- Dashboard Main Content Grid (Balanced 50/50 Layout) -->
 <div class="dashboard-content-grid">
+    {% if scheduled_interviews %}
+    <!-- Left Column (50% Width): Upcoming Interviews & Recent Applications Stack -->
+    <div class="dashboard-stack-column">
+        <!-- 1. Upcoming Interviews Card (Half Page) -->
+        <div class="card dashboard-column-card interviews-column-card">
+            <div class="card-header-row">
+                <h3 class="interviews-header-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    Upcoming Interviews
+                </h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="interviews-badge-count">{{ scheduled_interviews|length }} Scheduled</span>
+                    <a href="{% url 'student_portal:applications_list' %}" class="link-view-all">View All →</a>
+                </div>
+            </div>
+
+            <!-- Interview Clash Warning Banner -->
+            {% if clash_detected %}
+            <div class="interview-clash-alert" style="margin-bottom: 0.85rem; padding: 0.65rem 0.85rem;">
+                <div class="clash-alert-icon">⚠️</div>
+                <div class="clash-alert-content">
+                    <h4 class="clash-alert-title" style="font-size: 0.88rem; margin: 0 0 0.15rem 0;">Schedule Conflict / Time Clash!</h4>
+                    <p class="clash-alert-text" style="font-size: 0.78rem;">Interviews overlap on same date/time. Click "Request Reschedule" below.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="interviews-scroll-list">
+                {% for interview in scheduled_interviews %}
+                <div class="interview-card-item">
+                    <div class="interview-item-top">
+                        <div>
+                            <h4 class="interview-company-title" style="font-size: 1.05rem;">{{ interview.application.drive.company.company_name }}</h4>
+                            <p class="interview-drive-title" style="font-size: 0.82rem;">{{ interview.application.drive.title }}</p>
+                        </div>
+                        <div class="interview-badges-group">
+                            {% if interview.has_clash %}
+                                <span class="badge-time-clash" title="Clashes with another interview scheduled around the same time!">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    Time Clash
+                                </span>
+                            {% endif %}
+
+                            {% if interview.interview_mode == 'online' %}
+                                <span class="interview-mode-badge interview-mode-online" style="padding: 0.22rem 0.55rem; font-size: 0.74rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                    Online
+                                </span>
+                            {% else %}
+                                <span class="interview-mode-badge interview-mode-offline" style="padding: 0.22rem 0.55rem; font-size: 0.74rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    Offline
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Compact Details Grid -->
+                    <div class="interview-details-grid compact-details">
+                        <div class="interview-detail-block">
+                            <span class="interview-detail-label">Date</span>
+                            <span class="interview-detail-val" style="font-size: 0.85rem;">📅 {{ interview.interview_date|date:"D, d M Y" }}</span>
+                        </div>
+                        <div class="interview-detail-block">
+                            <span class="interview-detail-label">Time</span>
+                            <span class="interview-detail-val" style="font-size: 0.85rem;">⏰ {{ interview.interview_time|time:"h:i A" }}</span>
+                        </div>
+                        {% if interview.interview_mode == 'offline' %}
+                        <div class="interview-detail-block" style="grid-column: 1 / -1;">
+                            <span class="interview-detail-label">Venue</span>
+                            <span class="interview-detail-val" style="font-size: 0.82rem; white-space: pre-line;">📍 {{ interview.location_address }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if interview.description %}
+                    <div class="interview-notes-callout compact-notes">
+                        <strong>Instructions:</strong>
+                        <p style="margin: 0.15rem 0 0 0; white-space: pre-line;">{{ interview.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Compact Bottom Actions -->
+                    <div class="compact-bottom-actions">
+                        <div>
+                            {% if interview.interview_mode == 'online' and interview.meeting_link %}
+                            <a href="{{ interview.meeting_link }}" target="_blank" class="btn-join-meeting" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" title="{{ interview.meeting_link }}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                                Join Online Meeting
+                            </a>
+                            <div style="font-size: 0.73rem; color: var(--color-text-secondary); margin-top: 0.28rem;">
+                                Meeting link: <a href="{{ interview.meeting_link }}" target="_blank" style="color: #3b82f6; text-decoration: underline;" title="{{ interview.meeting_link }}">{{ interview.meeting_link|truncatechars:28 }}</a>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            {% if interview.reschedule_requested %}
+                                <div class="interview-reschedule-status-box" style="padding: 0.3rem 0.6rem;" title="Requested on {{ interview.reschedule_requested_at|date:'M d, Y h:i A' }}">
+                                    <span class="badge-reschedule-pending" style="font-size: 0.72rem; padding: 0.18rem 0.45rem;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        Reschedule Requested
+                                    </span>
+                                </div>
+                            {% else %}
+                                <button type="button"
+                                        class="btn-request-reschedule {% if interview.has_clash %}has-clash-btn{% endif %}"
+                                        style="padding: 0.35rem 0.75rem; font-size: 0.78rem;"
+                                        data-interview-id="{{ interview.id }}"
+                                        data-company-name="{{ interview.application.drive.company.company_name }}"
+                                        data-drive-title="{{ interview.application.drive.title }}"
+                                        data-interview-date="{{ interview.interview_date|date:'l, d F Y' }}"
+                                        data-interview-time="{{ interview.interview_time|time:'h:i A' }}"
+                                        data-interview-mode="{{ interview.get_interview_mode_display }}"
+                                        data-has-clash="{% if interview.has_clash %}true{% else %}false{% endif %}"
+                                        title="{% if interview.has_clash %}This interview clashes with another! Click to request a reschedule.{% else %}Request company recruiter to reschedule this interview{% endif %}">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                    <span>Request Reschedule</span>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 2. Recent Applications Card (In Left Column, right under Upcoming Interviews) -->
+        <div class="card dashboard-column-card">
+            <div class="card-header-row">
+                <h3>Recent Applications</h3>
+                <a href="{% url 'student_portal:applications_list' %}" class="link-view-all">View All →</a>
+            </div>
+            
+            {% if applications %}
+                <div class="recent-apps-scroll-list">
+                    {% for app in applications %}
+                    <div class="application-row">
+                        <div class="app-company-info">
+                            <div class="company-avatar-box">
+                                {{ app.drive.company.company_name|make_list|first|upper }}
+                            </div>
+                            <div>
+                                <h4 class="drive-item-title mb-025">{{ app.drive.company.company_name }}</h4>
+                                <p class="applicant-sub-text">Applied on {{ app.applied_at|date:"M d, Y" }}</p>
+                                {% with latest_interview=app.interview_schedules.first %}
+                                {% if latest_interview %}
+                                    <div style="font-size: 0.75rem; color: #3b82f6; font-weight: 600; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.3rem;">
+                                        <span>📅 {{ latest_interview.interview_date|date:"d M" }} &bull; {{ latest_interview.get_interview_mode_display }}</span>
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <div>
+                            {% if app.status == 'applied' %}
+                                <span class="status-pill applied">Applied</span>
+                            {% elif app.status == 'shortlisted' %}
+                                <span class="status-pill shortlisted">Shortlisted for Interview</span>
+                            {% elif app.status == 'interview_scheduled' %}
+                                <span class="status-pill interview">Interview Scheduled</span>
+                            {% elif app.status == 'selected' %}
+                                <span class="status-pill selected">Selected (Job Offer)</span>
+                            {% elif app.status == 'rejected' %}
+                                <span class="status-pill rejected">Rejected</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-box">
+                    <div class="empty-state-icon yellow">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h4>No applications yet</h4>
+                    <p>Once you apply to a placement drive, you can track your status here.</p>
+                    <a href="{% url 'student_portal:drives_list' %}" class="btn btn-secondary mt-15">Browse Drives</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Column (50% Width): New Eligible Drives & Placement Readiness Hub (Utilising Unused Space) -->
+    <div class="dashboard-stack-column">
+        <!-- 1. New Eligible Drives Card -->
+        <div class="card dashboard-column-card">
+            <div class="card-header-row">
+                <h3 class="interviews-header-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    New Eligible Drives
+                </h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="badge-count">{{ eligible_drives|length }} Available</span>
+                    <a href="{% url 'student_portal:drives_list' %}" class="link-view-all">Browse All →</a>
+                </div>
+            </div>
+            
+            {% if eligible_drives %}
+                <div class="recent-drives-scroll-list">
+                    {% for drive in eligible_drives %}
+                    <div class="drive-item-card">
+                        <div class="drive-item-header">
+                            <h4 class="company-name-tag">{{ drive.company.company_name }}</h4>
+                            {% if drive.job_roles %}
+                                <span class="job-role-pill">{{ drive.job_roles|truncatechars:15 }}</span>
+                            {% endif %}
+                        </div>
+                        <h5 class="drive-item-title">{{ drive.title }}</h5>
+                        
+                        <div class="drive-item-meta">
+                            <div>
+                                <span class="meta-label">Package</span>
+                                <span class="data-figure drive-highlight-salary">₹{{ drive.salary_package|default:"TBD" }}</span>
+                            </div>
+                            <div>
+                                <span class="meta-label">Deadline</span>
+                                <span class="data-figure meta-value-deadline">{{ drive.application_deadline|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'student_portal:drive_detail' drive.id %}" class="btn btn-primary btn-block">View & Apply</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-box">
+                    <div class="empty-state-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    </div>
+                    <h4>You're all caught up!</h4>
+                    <p>There are no new placement drives matching your eligibility right now. Check back later.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 2. Placement Hub & Tools Card (Utilising Unused Space) -->
+        <div class="card dashboard-column-card placement-hub-card">
+            <div class="card-header-row">
+                <h3 class="interviews-header-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Placement Hub & Readiness
+                </h3>
+                {% if profile.is_verified %}
+                    <span class="hub-verified-badge" title="Student Profile Verified by Placement Cell">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Verified
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Next Interview Spotlight -->
+            {% if next_interview %}
+            <div class="hub-spotlight-card">
+                <div class="hub-spotlight-icon">🎯</div>
+                <div class="hub-spotlight-content">
+                    <div class="hub-spotlight-header">
+                        <span class="hub-spotlight-label">NEXT INTERVIEW TARGET</span>
+                        {% if days_until_interview is not None %}
+                            {% if days_until_interview == 0 %}
+                                <span class="badge-countdown today">🔥 Today!</span>
+                            {% elif days_until_interview == 1 %}
+                                <span class="badge-countdown urgent">⚡ Tomorrow</span>
+                            {% elif days_until_interview > 1 %}
+                                <span class="badge-countdown">⏳ In {{ days_until_interview }} days</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <h4 class="hub-spotlight-title">{{ next_interview.application.drive.company.company_name }}</h4>
+                    <p class="hub-spotlight-sub">{{ next_interview.application.drive.title }} &bull; 📅 {{ next_interview.interview_date|date:"D, d M" }} at {{ next_interview.interview_time|time:"h:i A" }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Placement Funnel Pipeline -->
+            <div class="hub-pipeline-section">
+                <span class="hub-subsection-title">APPLICATION PIPELINE</span>
+                <div class="hub-funnel-grid">
+                    <div class="hub-funnel-box funnel-applied">
+                        <span class="hub-funnel-num">{{ applied_only_count }}</span>
+                        <span class="hub-funnel-label">Applied</span>
+                    </div>
+                    <div class="hub-funnel-box funnel-shortlisted">
+                        <span class="hub-funnel-num">{{ shortlisted_count }}</span>
+                        <span class="hub-funnel-label">Shortlist</span>
+                    </div>
+                    <div class="hub-funnel-box funnel-interview">
+                        <span class="hub-funnel-num">{{ interviews_scheduled }}</span>
+                        <span class="hub-funnel-label">Interviews</span>
+                    </div>
+                    <div class="hub-funnel-box funnel-offer">
+                        <span class="hub-funnel-num">{{ offers_received }}</span>
+                        <span class="hub-funnel-label">Offers</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Profile & Resume Tools -->
+            <div class="hub-tools-section">
+                <div class="hub-tools-buttons">
+                    {% if profile.resume %}
+                        <a href="{{ profile.resume.url }}" target="_blank" class="hub-action-btn hub-btn-primary" title="Preview your active uploaded resume">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            View Resume
+                        </a>
+                    {% else %}
+                        <a href="{% url 'student_portal:edit_profile' %}" class="hub-action-btn hub-btn-primary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            Upload Resume
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'student_portal:edit_profile' %}" class="hub-action-btn hub-btn-outline" title="Update CGPA, skills, or personal details">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Edit Profile
+                    </a>
+                </div>
+
+                <div class="hub-academic-tags">
+                    <span class="hub-tag" title="Department">🏛️ {{ profile.department.name|default:"IT" }}</span>
+                    <span class="hub-tag" title="Current CGPA">📈 {{ profile.cgpa|default:"8.0" }} CGPA</span>
+                </div>
+            </div>
+
+            <!-- TPO Guidance & Advice Box -->
+            <div class="hub-tip-callout">
+                <div class="hub-tip-icon">💡</div>
+                <div class="hub-tip-content">
+                    <strong>Placement Tip:</strong> Join online interviews 10 minutes early with camera checked and resume PDF ready. Have a clash? Use the <em>"Request Reschedule"</em> button on the left to alert the recruiter immediately.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- When NO Scheduled Interviews: Equal 50/50 Columns (Eligible Drives & Recent Applications) -->
     <!-- Left Column: Eligible Drives -->
     <div class="card dashboard-column-card">
         <div class="card-header-row">
@@ -132,7 +469,7 @@
     <div class="card dashboard-column-card">
         <div class="card-header-row">
             <h3>Recent Applications</h3>
-            <a href="{% url 'student_portal:drives_list' %}" class="link-view-all">View All →</a>
+            <a href="{% url 'student_portal:applications_list' %}" class="link-view-all">View All →</a>
         </div>
         
         {% if applications %}
@@ -146,17 +483,25 @@
                         <div>
                             <h4 class="drive-item-title mb-025">{{ app.drive.company.company_name }}</h4>
                             <p class="applicant-sub-text">Applied on {{ app.applied_at|date:"M d, Y" }}</p>
+                            {% with latest_interview=app.interview_schedules.first %}
+                            {% if latest_interview %}
+                                <div style="font-size: 0.75rem; color: #3b82f6; font-weight: 600; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.3rem;">
+                                    <span>📅 {{ latest_interview.interview_date|date:"d M" }} &bull; {{ latest_interview.get_interview_mode_display }}</span>
+                                </div>
+                            {% endif %}
+                            {% endwith %}
                         </div>
                     </div>
+
                     <div>
                         {% if app.status == 'applied' %}
                             <span class="status-pill applied">Applied</span>
                         {% elif app.status == 'shortlisted' %}
-                            <span class="status-pill shortlisted">Shortlisted</span>
+                            <span class="status-pill shortlisted">Shortlisted for Interview</span>
                         {% elif app.status == 'interview_scheduled' %}
-                            <span class="status-pill interview">Interview</span>
+                            <span class="status-pill interview">Interview Scheduled</span>
                         {% elif app.status == 'selected' %}
-                            <span class="status-pill selected">Selected</span>
+                            <span class="status-pill selected">Selected (Job Offer)</span>
                         {% elif app.status == 'rejected' %}
                             <span class="status-pill rejected">Rejected</span>
                         {% endif %}
@@ -175,5 +520,8 @@
             </div>
         {% endif %}
     </div>
+    {% endif %}
 </div>
+
+{% include 'student_portal/includes/reschedule_modal.html' %}
 {% endblock %}

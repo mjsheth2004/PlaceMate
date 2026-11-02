@@ -1,0 +1,200 @@
+<!-- Student Interview Reschedule Request Modal -->
+<div id="studentRescheduleModal" class="student-reschedule-backdrop" role="dialog" aria-modal="true" aria-labelledby="studentRescheduleModalTitle" style="display: none;">
+    <div class="student-reschedule-dialog">
+        <div class="student-reschedule-accent-bar"></div>
+        <div class="student-reschedule-header">
+            <div>
+                <span class="student-reschedule-badge">🔄 Reschedule Request</span>
+                <h3 id="studentRescheduleModalTitle" class="student-reschedule-title">Request Interview Reschedule</h3>
+                <p class="student-reschedule-subtitle" id="rescheduleModalCompanyPost">Loading details...</p>
+            </div>
+            <button type="button" class="student-reschedule-close" id="closeStudentRescheduleModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <form method="post" id="studentRescheduleForm" action="">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+            <div class="student-reschedule-body">
+                <!-- Current Schedule Info Card -->
+                <div class="current-schedule-info-card">
+                    <div class="info-card-item">
+                        <span class="info-label">CURRENT SCHEDULED TIME</span>
+                        <span class="info-value" id="rescheduleModalCurrentTime">📅 Sunday, 15 Nov &bull; 02:30 PM</span>
+                    </div>
+                    <div class="info-card-item">
+                        <span class="info-label">MODE</span>
+                        <span class="info-value" id="rescheduleModalMode">Online Video Interview</span>
+                    </div>
+                </div>
+
+                <!-- Clash highlight notice inside modal if triggered for clashed interview -->
+                <div id="rescheduleClashNotice" class="modal-clash-notice" style="display: none;">
+                    ⚡ <strong>Time Clash Detected:</strong> This interview conflicts with another scheduled interview. Let the company recruiter know so they can allocate an alternative time slot.
+                </div>
+
+                <!-- Reason Category Selector -->
+                <div class="form-group-custom">
+                    <label class="custom-form-label">Reason for Reschedule Request *</label>
+                    <div class="reason-options-grid">
+                        <label class="reason-option-card">
+                            <input type="radio" name="reason_category" value="clash" id="radioReasonClash" checked>
+                            <div class="reason-card-content">
+                                <span class="reason-icon">⚡</span>
+                                <div>
+                                    <strong>Interview Time Clash</strong>
+                                    <small>Clashes with another company's interview</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="reason-option-card">
+                            <input type="radio" name="reason_category" value="exam" id="radioReasonExam">
+                            <div class="reason-card-content">
+                                <span class="reason-icon">📚</span>
+                                <div>
+                                    <strong>Exam / Academic Clash</strong>
+                                    <small>University exam, viva, or lab test</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="reason-option-card">
+                            <input type="radio" name="reason_category" value="health" id="radioReasonHealth">
+                            <div class="reason-card-content">
+                                <span class="reason-icon">🏥</span>
+                                <div>
+                                    <strong>Medical / Emergency</strong>
+                                    <small>Health issue or personal emergency</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="reason-option-card">
+                            <input type="radio" name="reason_category" value="other" id="radioReasonOther">
+                            <div class="reason-card-content">
+                                <span class="reason-icon">📝</span>
+                                <div>
+                                    <strong>Other Reason</strong>
+                                    <small>Any other timing or connectivity issue</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Preferred Time Slots -->
+                <div class="form-group-custom">
+                    <label class="custom-form-label" for="suggestedTimeInput">Your Preferred Alternate Dates / Slots (Optional)</label>
+                    <input type="text" name="suggested_time" id="suggestedTimeInput" class="custom-input-field" placeholder="E.g., Tomorrow anytime after 3:00 PM, or Monday 10:00 AM - 1:00 PM">
+                    <span class="custom-field-hint">Help the recruiter quickly find a slot that works for both of you.</span>
+                </div>
+
+                <!-- Explanation / Additional Notes -->
+                <div class="form-group-custom">
+                    <label class="custom-form-label" for="reasonDetailsInput">Explanation & Note for Recruiter *</label>
+                    <textarea name="reason_details" id="reasonDetailsInput" rows="2" class="custom-input-field" required placeholder="Describe the conflict briefly (e.g., I have another technical interview scheduled with ABC Corp at the same time. I would sincerely appreciate if my interview could be rescheduled)."></textarea>
+                </div>
+            </div>
+
+            <div class="student-reschedule-footer">
+                <button type="button" class="btn btn-secondary" id="cancelStudentRescheduleBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-submit-reschedule" id="submitRescheduleBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    Send Reschedule Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('studentRescheduleModal');
+    if (!modal) return;
+
+    const form = document.getElementById('studentRescheduleForm');
+    const companyPostText = document.getElementById('rescheduleModalCompanyPost');
+    const currentTimeText = document.getElementById('rescheduleModalCurrentTime');
+    const modeText = document.getElementById('rescheduleModalMode');
+    const clashNotice = document.getElementById('rescheduleClashNotice');
+    const radioClash = document.getElementById('radioReasonClash');
+    const reasonDetails = document.getElementById('reasonDetailsInput');
+    const suggestedTime = document.getElementById('suggestedTimeInput');
+    const submitBtn = document.getElementById('submitRescheduleBtn');
+    const closeBtn = document.getElementById('closeStudentRescheduleModalBtn');
+    const cancelBtn = document.getElementById('cancelStudentRescheduleBtn');
+
+    function openRescheduleModal(btn) {
+        const interviewId = btn.getAttribute('data-interview-id');
+        const companyName = btn.getAttribute('data-company-name') || '';
+        const driveTitle = btn.getAttribute('data-drive-title') || '';
+        const dateStr = btn.getAttribute('data-interview-date') || '';
+        const timeStr = btn.getAttribute('data-interview-time') || '';
+        const modeStr = btn.getAttribute('data-interview-mode') || 'Interview';
+        const hasClash = btn.getAttribute('data-has-clash') === 'true';
+
+        // Set action url
+        form.action = `/student/interviews/${interviewId}/request-reschedule/`;
+        companyPostText.innerHTML = `<strong>${companyName}</strong> &bull; ${driveTitle}`;
+        currentTimeText.innerHTML = `📅 ${dateStr} &bull; ⏰ ${timeStr}`;
+        modeText.textContent = modeStr;
+
+        if (hasClash) {
+            clashNotice.style.display = 'block';
+            if (radioClash) radioClash.checked = true;
+            if (!reasonDetails.value) {
+                reasonDetails.value = "I have another scheduled interview conflicting at this time. Kindly reschedule to an alternate time slot.";
+            }
+        } else {
+            clashNotice.style.display = 'none';
+            reasonDetails.value = '';
+        }
+        suggestedTime.value = '';
+
+        modal.style.display = 'flex';
+        void modal.offsetWidth;
+        modal.classList.add('modal-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRescheduleModal() {
+        modal.classList.remove('modal-active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 220);
+    }
+
+    document.querySelectorAll('.btn-request-reschedule').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            openRescheduleModal(this);
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeRescheduleModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeRescheduleModal);
+
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            closeRescheduleModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('modal-active')) {
+            closeRescheduleModal();
+        }
+    });
+
+    if (form) {
+        form.addEventListener('submit', function () {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.85"></path></svg>
+                Sending Request...
+            `;
+        });
+    }
+});
+</script>

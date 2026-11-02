@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Scheduled - {{ drive_title }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #ffffff !important; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 30px; color: #ffffff !important; }
+        .header { text-align: center; border-bottom: 1px solid #1f2937; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin: 0; color: #38bdf8 !important; }
+        .badge { display: inline-block; padding: 6px 14px; border-radius: 9999px; font-weight: 700; font-size: 13px; margin-top: 10px; }
+        .badge-online { background-color: #1e3a8a; border: 1px solid #3b82f6; color: #bfdbfe !important; }
+        .badge-offline { background-color: #064e3b; border: 1px solid #10b981; color: #a7f3d0 !important; }
+        .content { color: #ffffff !important; font-size: 15px; line-height: 1.6; }
+        .content p { color: #ffffff !important; margin: 0 0 16px 0; }
+        .details-box { background-color: #0b0f19; border: 1px solid #374151; border-radius: 8px; padding: 18px; margin: 20px 0; color: #ffffff !important; }
+        .details-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1f2937; }
+        .details-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .label { color: #94a3b8 !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .value { color: #ffffff !important; font-weight: 600; font-size: 14px; }
+        .instructions-box { background-color: #182234; border-left: 4px solid #38bdf8; border-radius: 4px; padding: 14px; margin: 20px 0; }
+        .btn { display: inline-block; background-color: #2563eb; color: #ffffff !important; text-decoration: none; padding: 12px 26px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center; }
+        .btn-meet { background-color: #059669; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #94a3b8 !important; border-top: 1px solid #1f2937; padding-top: 15px; }
+    </style>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #ffffff !important; margin: 0; padding: 20px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0b0f19;">
+        <tr>
+            <td align="center">
+                <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 30px; text-align: left; color: #ffffff !important;">
+                    <div class="header" style="text-align: center; border-bottom: 1px solid #1f2937; padding-bottom: 20px; margin-bottom: 20px;">
+                        <h1 style="color: #38bdf8 !important; font-size: 24px; margin: 0;">📅 Interview Scheduled</h1>
+                        <span style="display: inline-block; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; margin-top: 10px; {% if interview.interview_mode == 'online' %}background-color: #1e3a8a; border: 1px solid #3b82f6; color: #bfdbfe;{% else %}background-color: #064e3b; border: 1px solid #10b981; color: #a7f3d0;{% endif %}">
+                            {{ interview.get_interview_mode_display }} Interview
+                        </span>
+                    </div>
+
+                    <div class="content" style="color: #ffffff !important; font-size: 15px; line-height: 1.6;">
+                        <p style="color: #ffffff !important; margin: 0 0 16px 0;">Dear <strong style="color: #ffffff !important;">{{ student_name }}</strong>,</p>
+                        <p style="color: #ffffff !important; margin: 0 0 16px 0;">
+                            We are pleased to inform you that <strong style="color: #38bdf8 !important;">{{ company_name }}</strong> has scheduled an interview for your application to <strong style="color: #ffffff !important;">{{ drive_title }}</strong>.
+                        </p>
+
+                        <!-- Key Schedule Details Box -->
+                        <div class="details-box" style="background-color: #0b0f19; border: 1px solid #374151; border-radius: 8px; padding: 18px; margin: 20px 0; color: #ffffff !important;">
+                            <table width="100%" cellpadding="6" cellspacing="0" style="color: #ffffff !important;">
+                                <tr>
+                                    <td style="color: #94a3b8 !important; font-size: 13px; width: 35%;">Date:</td>
+                                    <td style="color: #ffffff !important; font-weight: 700; font-size: 14px;">{{ formatted_date|default:interview.interview_date }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #94a3b8 !important; font-size: 13px;">Time:</td>
+                                    <td style="color: #ffffff !important; font-weight: 700; font-size: 14px;">{{ formatted_time|default:interview.interview_time }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #94a3b8 !important; font-size: 13px;">Mode:</td>
+                                    <td style="color: #ffffff !important; font-weight: 700; font-size: 14px;">{{ interview.get_interview_mode_display }}</td>
+                                </tr>
+                                {% if interview.interview_mode == 'offline' %}
+                                <tr>
+                                    <td style="color: #94a3b8 !important; font-size: 13px; vertical-align: top;">Location / Venue:</td>
+                                    <td style="color: #38bdf8 !important; font-weight: 600; font-size: 14px; white-space: pre-line;">{{ interview.location_address }}</td>
+                                </tr>
+                                {% else %}
+                                {% if interview.meeting_link %}
+                                <tr>
+                                    <td style="color: #94a3b8 !important; font-size: 13px; vertical-align: top;">Meeting Link:</td>
+                                    <td style="color: #ffffff !important; font-weight: 600; font-size: 14px;">
+                                        <a href="{{ interview.meeting_link }}" target="_blank" style="color: #38bdf8; text-decoration: underline; word-break: break-all;">
+                                            {{ interview.meeting_link }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endif %}
+                            </table>
+                        </div>
+
+                        {% if interview.description %}
+                        <div style="background-color: #182234; border-left: 4px solid #38bdf8; border-radius: 4px; padding: 14px; margin: 20px 0; color: #ffffff !important;">
+                            <strong style="color: #38bdf8 !important; display: block; margin-bottom: 6px;">Recruiter Notes & Instructions:</strong>
+                            <p style="color: #e2e8f0 !important; margin: 0; font-size: 14px; white-space: pre-line;">{{ interview.description }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if interview.interview_mode == 'online' and interview.meeting_link %}
+                        <div style="text-align: center; margin: 30px 0 15px 0;">
+                            <a href="{{ interview.meeting_link }}" target="_blank" style="display: inline-block; background-color: #059669; color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 700; font-size: 15px; margin-bottom: 8px;">
+                                🔗 Join Meeting Link
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <p style="color: #94a3b8 !important; font-size: 13px; margin-top: 20px;">
+                            💡 <strong>Tip:</strong> Please ensure you are prepared 10 minutes prior to the scheduled time. For online interviews, check your microphone, camera, and internet connection beforehand.
+                        </p>
+                    </div>
+
+                    <div class="footer" style="text-align: center; margin-top: 30px; font-size: 12px; color: #94a3b8 !important; border-top: 1px solid #1f2937; padding-top: 15px;">
+                        <p style="color: #94a3b8 !important; margin: 0;">This email was sent automatically by PlaceMate on behalf of {{ company_name }}.</p>
+                        <p style="color: #64748b !important; margin: 4px 0 0 0;">&copy; PlaceMate Campus Recruitment Platform</p>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

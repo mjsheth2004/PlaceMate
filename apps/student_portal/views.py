@@ -1,18 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.contrib import messages
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.conf import settings
-from .models import Application
+from .models import Application, InterviewSchedule, StudentProfile
 from apps.common.models import PlacementDrive
 
 @login_required
 def dashboard_view(request):
     try:
         profile = request.user.studentprofile
-    except:
+    except Exception:
         return render(request, 'student_portal/dashboard.html', {'error': 'Profile not found.'})
 
     # Calculate profile completeness
@@ -29,7 +31,38 @@ def dashboard_view(request):
             
     completion_percentage = int((filled_fields / len(fields_to_check)) * 100)
 
-    applications = Application.objects.filter(student=profile).select_related('drive', 'drive__company').order_by('-applied_at')[:5]
+    applications = Application.objects.filter(student=profile).select_related(
+        'drive', 'drive__company'
+    ).prefetch_related('interview_schedules').order_by('-applied_at')[:5]
+
+    # Fetch active scheduled interviews for this student, deduplicated by application
+    raw_interviews = list(InterviewSchedule.objects.filter(
+        application__student=profile,
+        status='scheduled'
+    ).select_related('application', 'application__drive', 'application__drive__company').order_by('interview_date', 'interview_time'))
+
+    seen_apps = set()
+    scheduled_interviews = []
+    for itw in raw_interviews:
+        if itw.application_id not in seen_apps:
+            seen_apps.add(itw.application_id)
+            scheduled_interviews.append(itw)
+
+    # Detect clashes: check if any two interviews occur on the same date with overlapping time (within 60 mins)
+    clash_detected = False
+    for i in range(len(scheduled_interviews)):
+        for j in range(i + 1, len(scheduled_interviews)):
+            itw1 = scheduled_interviews[i]
+            itw2 = scheduled_interviews[j]
+            if itw1.interview_date == itw2.interview_date:
+                t1 = itw1.interview_time
+                t2 = itw2.interview_time
+                mins1 = t1.hour * 60 + t1.minute
+                mins2 = t2.hour * 60 + t2.minute
+                if abs(mins1 - mins2) < 60:
+                    itw1.has_clash = True
+                    itw2.has_clash = True
+                    clash_detected = True
 
     now = timezone.now()
     applied_drive_ids = Application.objects.filter(student=profile).values_list('drive_id', flat=True)
@@ -57,16 +90,32 @@ def dashboard_view(request):
         eligible_passing_year=profile.passing_year or 0
     ).exclude(id__in=applied_drive_ids).count()
 
+    # Detailed Application Pipeline Stats for Hub Widget
+    applied_only_count = Application.objects.filter(student=profile, status='applied').count()
+    shortlisted_count = Application.objects.filter(student=profile, status='shortlisted').count()
+    next_interview = scheduled_interviews[0] if scheduled_interviews else None
+    days_until_interview = None
+    if next_interview and next_interview.interview_date:
+        days_until_interview = (next_interview.interview_date - now.date()).days
+
     context = {
+        'profile': profile,
         'completion_percentage': completion_percentage,
         'applications': applications,
+        'scheduled_interviews': scheduled_interviews,
+        'clash_detected': clash_detected,
         'eligible_drives': eligible_drives,
         'total_applications': total_applications,
         'interviews_scheduled': interviews_scheduled,
         'offers_received': offers_received,
         'total_eligible_drives': total_eligible_drives,
+        'applied_only_count': applied_only_count,
+        'shortlisted_count': shortlisted_count,
+        'next_interview': next_interview,
+        'days_until_interview': days_until_interview,
     }
     return render(request, 'student_portal/dashboard.html', context)
+
 
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -262,13 +311,123 @@ The PlaceMate Team
 def applications_list_view(request):
     profile = request.user.studentprofile
     
-    applications = Application.objects.filter(student=profile).select_related(
+    applications = list(Application.objects.filter(student=profile).select_related(
         'drive', 'drive__company'
-    ).order_by('-applied_at')
+    ).prefetch_related('interview_schedules').order_by('-applied_at'))
     
+    # Collect scheduled interviews to detect time clashes
+    scheduled_interviews = []
+    for app in applications:
+        for itw in app.interview_schedules.all():
+            if itw.status == 'scheduled':
+                scheduled_interviews.append(itw)
+                
+    clash_detected = False
+    for i in range(len(scheduled_interviews)):
+        for j in range(i + 1, len(scheduled_interviews)):
+            itw1 = scheduled_interviews[i]
+            itw2 = scheduled_interviews[j]
+            if itw1.interview_date == itw2.interview_date:
+                t1 = itw1.interview_time
+                t2 = itw2.interview_time
+                mins1 = t1.hour * 60 + t1.minute
+                mins2 = t2.hour * 60 + t2.minute
+                if abs(mins1 - mins2) < 60:
+                    itw1.has_clash = True
+                    itw2.has_clash = True
+                    clash_detected = True
+
     return render(request, 'student_portal/applications_list.html', {
-        'applications': applications
+        'applications': applications,
+        'clash_detected': clash_detected,
     })
+
+@login_required
+@require_POST
+def request_interview_reschedule_view(request, interview_id):
+    try:
+        profile = request.user.studentprofile
+    except Exception:
+        messages.error(request, "Student profile required.")
+        return redirect('student_portal:dashboard')
+
+    interview = get_object_or_404(InterviewSchedule, pk=interview_id, application__student=profile)
+    
+    reason_category = request.POST.get('reason_category', 'clash').strip()
+    reason_details = request.POST.get('reason_details', '').strip()
+    suggested_time = request.POST.get('suggested_time', '').strip()
+    
+    category_labels = {
+        'clash': 'Time Clash with Another Interview',
+        'exam': 'College Exam / Academic Clash',
+        'health': 'Medical Emergency / Health',
+        'other': 'Scheduling Conflict'
+    }
+    category_display = category_labels.get(reason_category, 'Scheduling Conflict')
+    
+    parts = [f"[{category_display}]"]
+    if reason_details:
+        parts.append(reason_details)
+    if suggested_time:
+        parts.append(f"Candidate preferred slot: {suggested_time}")
+        
+    full_reason = " — ".join(parts)
+        
+    interview.reschedule_requested = True
+    interview.reschedule_reason = full_reason
+    interview.reschedule_requested_at = timezone.now()
+    interview.save()
+    
+    # Notify recruiter via email
+    company_email = interview.application.drive.company.user.email
+    company_name = interview.application.drive.company.company_name
+    drive_title = interview.application.drive.title
+    student_name = profile.full_name or request.user.username
+    
+    try:
+        subject = f"Interview Reschedule Request: {student_name} - {drive_title}"
+        plain_message = f"""Dear {company_name} Recruitment Team,
+
+Candidate {student_name} (Roll No: {profile.roll_number}) has requested to reschedule their interview for {drive_title}.
+
+Current Schedule:
+- Date: {interview.interview_date}
+- Time: {interview.interview_time}
+- Mode: {interview.get_interview_mode_display()}
+
+Reason for Reschedule Request:
+{full_reason}
+
+You can reschedule their interview at:
+{request.build_absolute_uri('/company/applicants/')}
+
+Best regards,
+PlaceMate Campus Placement System
+"""
+        html_message = render_to_string('emails/reschedule_request_notification.html', {
+            'company_name': company_name,
+            'student_name': student_name,
+            'roll_number': profile.roll_number,
+            'drive_title': drive_title,
+            'interview': interview,
+            'reason': full_reason,
+            'portal_url': request.build_absolute_uri('/company/applicants/'),
+        })
+        
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[company_email],
+            html_message=html_message,
+            fail_silently=True,
+        )
+    except Exception as e:
+        print(f"Error sending reschedule request email to company: {e}")
+        
+    messages.success(request, f"Reschedule request sent to {company_name}. They have been notified to review and update your interview time.")
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or redirect('student_portal:dashboard').url
+    return redirect(next_url)
 
 import json
 from datetime import datetime

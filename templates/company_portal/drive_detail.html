@@ -3,6 +3,396 @@
 {% block title %}{{ drive.title }} - PlaceMate Recruiter{% endblock %}
 
 {% block company_content %}
+<style>
+/* ==========================================================================
+   Floating Interview Window & High-Polish UI Integration
+   ========================================================================== */
+.floating-interview-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 999999 !important;
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.floating-interview-backdrop.modal-active {
+    display: flex !important;
+    opacity: 1;
+}
+
+.floating-interview-dialog {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 580px !important;
+    max-height: 90vh !important;
+    background: var(--color-surface, #ffffff) !important;
+    border: 1px solid var(--color-border, #e2e8f0) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform: scale(0.92) translateY(24px);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.floating-interview-backdrop.modal-active .floating-interview-dialog {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.floating-accent-bar {
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #2A9D8F, #38bdf8, #6366f1);
+}
+
+.floating-modal-header {
+    padding: 1.25rem 1.5rem 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--color-border, #e2e8f0);
+    background: var(--color-surface, #ffffff);
+}
+
+.floating-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.floating-badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-primary, #2A9D8F);
+    background: rgba(42, 157, 143, 0.12);
+    padding: 0.2rem 0.55rem;
+    border-radius: 12px;
+    width: fit-content;
+}
+
+.floating-modal-title {
+    margin: 0.2rem 0 0 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #0f172a);
+    font-family: var(--font-heading, inherit);
+    line-height: 1.3;
+}
+
+.floating-candidate-chip {
+    font-size: 0.83rem;
+    color: var(--color-text-secondary, #64748b);
+    line-height: 1.4;
+    margin-top: 0.2rem;
+}
+
+.floating-candidate-chip strong {
+    color: var(--color-text-primary, #0f172a);
+}
+
+.floating-btn-close {
+    background: rgba(0, 0, 0, 0.04);
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--color-text-secondary, #64748b);
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.floating-btn-close:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--color-text-primary, #0f172a);
+    transform: rotate(90deg);
+}
+
+[data-theme="dark"] .floating-btn-close {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .floating-btn-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.floating-modal-body {
+    padding: 1.4rem 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.floating-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--color-border, #e2e8f0);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.015);
+}
+
+[data-theme="dark"] .floating-modal-footer {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Action column button styles */
+.action-cell-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 165px;
+}
+
+.status-update-inline-form {
+    margin: 0;
+    width: 100%;
+}
+
+.status-update-inline-form .input-field {
+    width: 100%;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+.btn-schedule-interview {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+}
+
+/* Standout styling specifically for Selected Candidates */
+.btn-schedule-selected {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.btn-schedule-selected:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+}
+
+.btn-schedule-reschedule {
+    background: var(--color-surface, #ffffff);
+    border: 1px solid #3b82f6;
+    color: #2563eb;
+}
+
+.btn-schedule-reschedule:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="dark"] .btn-schedule-reschedule {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: #60a5fa;
+    color: #93c5fd;
+}
+
+.scheduled-interview-mini-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-top: 0.1rem;
+}
+
+[data-theme="dark"] .scheduled-interview-mini-pill {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+
+/* Form controls inside modal */
+.mode-segment-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+
+.mode-segment-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--color-border, #e2e8f0);
+    border-radius: 10px;
+    background: var(--color-surface, #ffffff);
+    color: var(--color-text-secondary, #64748b);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mode-segment-btn:hover {
+    border-color: var(--color-primary, #2A9D8F);
+    color: var(--color-primary, #2A9D8F);
+}
+
+.mode-segment-btn.active {
+    border-color: var(--color-primary, #2A9D8F);
+    background: rgba(42, 157, 143, 0.08);
+    color: var(--color-primary, #2A9D8F);
+    box-shadow: 0 0 0 1px var(--color-primary, #2A9D8F);
+}
+
+.form-grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.field-hint {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--color-text-secondary, #64748b);
+    margin-top: 0.35rem;
+}
+
+.spin-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.scheduled-reschedule-alert-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    animation: pulseBorder 2s infinite ease-in-out;
+}
+
+[data-theme="dark"] .scheduled-reschedule-alert-pill {
+    background-color: rgba(239, 68, 68, 0.22);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.45);
+}
+
+.btn-reschedule-urgent {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.08) !important;
+    color: #dc2626 !important;
+}
+
+.btn-reschedule-urgent:hover {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-reschedule-urgent {
+    border-color: #f87171 !important;
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #fca5a5 !important;
+}
+
+.floating-reschedule-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.14));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-left: 4px solid #ef4444;
+}
+
+[data-theme="dark"] .floating-reschedule-banner {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(245, 158, 11, 0.18));
+    border-color: rgba(239, 68, 68, 0.45);
+}
+
+.reschedule-banner-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.reschedule-banner-body {
+    flex: 1;
+}
+
+.reschedule-banner-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #b91c1c;
+    margin: 0;
+}
+
+[data-theme="dark"] .reschedule-banner-title {
+    color: #fca5a5;
+}
+
+.reschedule-banner-reason {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.82rem;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    white-space: pre-line;
+}
+
+.reschedule-banner-time {
+    margin-top: 0.3rem;
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+}
+</style>
+
 <div class="cp-page-header">
     <div>
         <div class="profile-title-flex">
@@ -121,7 +511,7 @@
                 <th>Resume</th>
                 <th>Applied On</th>
                 <th>Status</th>
-                <th>Update Status</th>
+                <th>Action & Interview</th>
             </tr>
         </thead>
         <tbody>
@@ -145,17 +535,78 @@
                 <td>
                     <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
                 </td>
-                <td>
-                    <form method="post" action="{% url 'company_portal:update_application_status' app.pk %}" class="btn-action-group">
-                        {% csrf_token %}
-                        <select name="status" class="input-field status-select-input auto-submit-status">
-                            <option value="applied" {% if app.status == 'applied' %}selected{% endif %}>Applied</option>
-                            <option value="shortlisted" {% if app.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
-                            <option value="interview_scheduled" {% if app.status == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
-                            <option value="selected" {% if app.status == 'selected' %}selected{% endif %}>Selected</option>
-                            <option value="rejected" {% if app.status == 'rejected' %}selected{% endif %}>Rejected</option>
-                        </select>
-                    </form>
+                <td class="action-cell">
+                    <div class="action-cell-stack">
+                        <form method="post" action="{% url 'company_portal:update_application_status' app.pk %}" class="status-update-inline-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <select name="status" class="input-field status-select-input auto-submit-status">
+                                <option value="applied" {% if app.status == 'applied' %}selected{% endif %}>Applied</option>
+                                <option value="shortlisted" {% if app.status == 'shortlisted' %}selected{% endif %}>Shortlisted for Interview</option>
+                                <option value="interview_scheduled" {% if app.status == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
+                                <option value="selected" {% if app.status == 'selected' %}selected{% endif %}>Selected (Job Offer)</option>
+                                <option value="rejected" {% if app.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </form>
+
+                        <!-- Schedule Interview Button ONLY for Shortlisted Candidates -->
+                        {% if app.status == 'shortlisted' %}
+                            <button type="button"
+                                    class="btn btn-schedule-interview btn-schedule-selected"
+                                    data-app-id="{{ app.pk }}"
+                                    data-student-name="{{ app.student.full_name }}"
+                                    data-student-email="{{ app.student.user.email }}"
+                                    data-student-roll="{{ app.student.roll_number }}"
+                                    data-drive-title="{{ drive.title }}"
+                                    data-status="{{ app.status }}"
+                                    data-has-interview="false"
+                                    title="Candidate is Shortlisted for Interview! Click to schedule their interview and send email invitation.">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <span>Schedule Interview</span>
+                            </button>
+                        {% elif app.status == 'interview_scheduled' %}
+                            {% with latest_interview=app.interview_schedules.first %}
+                            <button type="button"
+                                    class="btn btn-schedule-interview btn-schedule-reschedule {% if latest_interview.reschedule_requested %}btn-reschedule-urgent{% endif %}"
+                                    data-app-id="{{ app.pk }}"
+                                    data-student-name="{{ app.student.full_name }}"
+                                    data-student-email="{{ app.student.user.email }}"
+                                    data-student-roll="{{ app.student.roll_number }}"
+                                    data-drive-title="{{ drive.title }}"
+                                    data-status="{{ app.status }}"
+                                    data-has-interview="{% if latest_interview %}true{% else %}false{% endif %}"
+                                    data-interview-date="{% if latest_interview %}{{ latest_interview.interview_date|date:'Y-m-d' }}{% endif %}"
+                                    data-interview-time="{% if latest_interview %}{{ latest_interview.interview_time|time:'H:i' }}{% endif %}"
+                                    data-interview-mode="{% if latest_interview %}{{ latest_interview.interview_mode }}{% else %}online{% endif %}"
+                                    data-interview-location="{% if latest_interview %}{{ latest_interview.location_address|default:'' }}{% endif %}"
+                                    data-interview-link="{% if latest_interview %}{{ latest_interview.meeting_link|default:'' }}{% endif %}"
+                                    data-interview-desc="{% if latest_interview %}{{ latest_interview.description|default:'' }}{% endif %}"
+                                    data-reschedule-requested="{% if latest_interview.reschedule_requested %}true{% else %}false{% endif %}"
+                                    data-reschedule-reason="{% if latest_interview %}{{ latest_interview.reschedule_reason|default:'' }}{% endif %}"
+                                    data-reschedule-time="{% if latest_interview.reschedule_requested_at %}{{ latest_interview.reschedule_requested_at|date:'M d, Y h:i A' }}{% endif %}"
+                                    title="{% if latest_interview.reschedule_requested %}Candidate requested to reschedule! Click to view request and set new time.{% else %}Interview is already scheduled. Click to reschedule or resend email.{% endif %}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                {% if latest_interview.reschedule_requested %}
+                                    <span>Reschedule (Requested)</span>
+                                {% else %}
+                                    <span>Reschedule / Email</span>
+                                {% endif %}
+                            </button>
+
+                            {% if latest_interview %}
+                                {% if latest_interview.reschedule_requested %}
+                                    <div class="scheduled-reschedule-alert-pill" title="Candidate Reason: {{ latest_interview.reschedule_reason }}">
+                                        ⚠️ Reschedule Requested
+                                    </div>
+                                {% else %}
+                                    <div class="scheduled-interview-mini-pill" title="Scheduled on {{ latest_interview.interview_date }} at {{ latest_interview.interview_time }}">
+                                        📅 {{ latest_interview.interview_date|date:"d M" }} &bull; {{ latest_interview.get_interview_mode_display }}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             {% endfor %}
@@ -167,4 +618,252 @@
     <p>No candidate applications matching this criteria.</p>
 </div>
 {% endif %}
+
+<!-- Floating Interview Window (Modal Overlay) -->
+<div id="interviewModal" class="floating-interview-backdrop" role="dialog" aria-modal="true" aria-labelledby="interviewModalTitle" style="display: none;">
+    <div class="floating-interview-dialog">
+        <div class="floating-accent-bar"></div>
+        <div class="floating-modal-header">
+            <div class="floating-header-info">
+                <span class="floating-badge-tag">📅 Interview Scheduler</span>
+                <h3 id="interviewModalTitle" class="floating-modal-title">Schedule Interview & Send Email</h3>
+                <div id="interviewCandidateSubtitle" class="floating-candidate-chip">Candidate: Loading...</div>
+            </div>
+            <button type="button" class="floating-btn-close" id="closeInterviewModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <form method="post" action="{% url 'company_portal:schedule_interview' %}" id="scheduleInterviewForm">
+            {% csrf_token %}
+            <input type="hidden" name="application_id" id="modalApplicationId">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="interview_mode" id="modalInterviewModeInput" value="online">
+
+            <div class="floating-modal-body">
+                <!-- Candidate Reschedule Request Notification Banner -->
+                <div id="modalRescheduleBanner" class="floating-reschedule-banner" style="display: none;">
+                    <div class="reschedule-banner-icon">⚠️</div>
+                    <div class="reschedule-banner-body">
+                        <div class="reschedule-banner-title">Candidate Requested Reschedule</div>
+                        <p id="modalRescheduleReason" class="reschedule-banner-reason"></p>
+                        <div id="modalRescheduleTime" class="reschedule-banner-time"></div>
+                    </div>
+                </div>
+
+                <!-- Mode Selector Segment Control -->
+                <div>
+                    <label class="input-label drive-highlight-label">Interview Mode</label>
+                    <div class="mode-segment-group">
+                        <button type="button" class="mode-segment-btn active" id="modeBtnOnline" data-mode="online">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            Online (Virtual / Video Call)
+                        </button>
+                        <button type="button" class="mode-segment-btn" id="modeBtnOffline" data-mode="offline">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Offline (In-Person / Campus)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date & Time Grid -->
+                <div class="form-grid-2-col">
+                    <div>
+                        <label class="input-label drive-highlight-label" for="modalInterviewDate">Interview Date *</label>
+                        <input type="date" name="interview_date" id="modalInterviewDate" class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="input-label drive-highlight-label" for="modalInterviewTime">Interview Time *</label>
+                        <input type="time" name="interview_time" id="modalInterviewTime" class="input-field" required>
+                    </div>
+                </div>
+
+                <!-- Online Virtual Meeting Fields -->
+                <div id="onlineFieldsContainer">
+                    <div>
+                        <label class="input-label drive-highlight-label" for="modalMeetingLink">Meeting Link (Google Meet, Zoom, Teams) *</label>
+                        <input type="text" name="meeting_link" id="modalMeetingLink" class="input-field" placeholder="https://meet.google.com/xyz-abc-def">
+                        <span class="field-hint">Candidate receives this link directly in email and can join with 1 click from dashboard.</span>
+                    </div>
+                </div>
+
+                <!-- Offline In-Person Fields -->
+                <div id="offlineFieldsContainer" style="display: none;">
+                    <div>
+                        <label class="input-label drive-highlight-label" for="modalLocationAddress">Place / Venue Address *</label>
+                        <textarea name="location_address" id="modalLocationAddress" rows="3" class="input-field" placeholder="E.g., Placement Cell Room 204, Main Campus Building, Central Block&#10;Or: Company Office, 4th Floor Tech Tower, Silicon Park"></textarea>
+                        <span class="field-hint">Specify full physical address, room number, or floor details for the candidate to report.</span>
+                    </div>
+                </div>
+
+                <!-- Description / Instructions -->
+                <div>
+                    <label class="input-label drive-highlight-label" for="modalDescription">Description & Candidate Instructions</label>
+                    <textarea name="description" id="modalDescription" rows="3" class="input-field" placeholder="E.g. Technical Round 1: Data Structures, Algorithms and React. Please be present 10 minutes prior with your college ID card and updated resume."></textarea>
+                </div>
+            </div>
+
+            <div class="floating-modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelInterviewModalBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitInterviewBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    Send Email & Schedule Interview
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('interviewModal');
+    const closeBtn = document.getElementById('closeInterviewModalBtn');
+    const cancelBtn = document.getElementById('cancelInterviewModalBtn');
+    const form = document.getElementById('scheduleInterviewForm');
+    const applicationIdInput = document.getElementById('modalApplicationId');
+    const subtitle = document.getElementById('interviewCandidateSubtitle');
+    const dateInput = document.getElementById('modalInterviewDate');
+    const timeInput = document.getElementById('modalInterviewTime');
+    const modeInput = document.getElementById('modalInterviewModeInput');
+    const meetLinkInput = document.getElementById('modalMeetingLink');
+    const locAddressInput = document.getElementById('modalLocationAddress');
+    const descInput = document.getElementById('modalDescription');
+    const modeBtnOnline = document.getElementById('modeBtnOnline');
+    const modeBtnOffline = document.getElementById('modeBtnOffline');
+    const onlineContainer = document.getElementById('onlineFieldsContainer');
+    const offlineContainer = document.getElementById('offlineFieldsContainer');
+    const submitBtn = document.getElementById('submitInterviewBtn');
+    const rescheduleBanner = document.getElementById('modalRescheduleBanner');
+    const rescheduleReason = document.getElementById('modalRescheduleReason');
+    const rescheduleTime = document.getElementById('modalRescheduleTime');
+
+    // Prevent past dates
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (dateInput) {
+        dateInput.setAttribute('min', todayStr);
+    }
+
+    function switchInterviewMode(mode) {
+        modeInput.value = mode;
+        if (mode === 'offline') {
+            modeBtnOffline.classList.add('active');
+            modeBtnOnline.classList.remove('active');
+            offlineContainer.style.display = 'block';
+            onlineContainer.style.display = 'none';
+            locAddressInput.required = true;
+            meetLinkInput.required = false;
+        } else {
+            modeBtnOnline.classList.add('active');
+            modeBtnOffline.classList.remove('active');
+            onlineContainer.style.display = 'block';
+            offlineContainer.style.display = 'none';
+            meetLinkInput.required = true;
+            locAddressInput.required = false;
+        }
+    }
+
+    if (modeBtnOnline) modeBtnOnline.addEventListener('click', () => switchInterviewMode('online'));
+    if (modeBtnOffline) modeBtnOffline.addEventListener('click', () => switchInterviewMode('offline'));
+
+    function cleanAttrValue(val) {
+        if (!val) return '';
+        return val.replace(/\\u002D/gi, '-').replace(/\\u0026/gi, '&').replace(/\\u0022/gi, '"').replace(/\\u0027/gi, "'");
+    }
+
+    function openInterviewModal(btn) {
+        const appId = btn.getAttribute('data-app-id');
+        const studentName = btn.getAttribute('data-student-name');
+        const studentEmail = btn.getAttribute('data-student-email');
+        const studentRoll = btn.getAttribute('data-student-roll');
+        const driveTitle = btn.getAttribute('data-drive-title');
+        const hasInterview = btn.getAttribute('data-has-interview') === 'true';
+        const isRescheduleRequested = btn.getAttribute('data-reschedule-requested') === 'true';
+
+        applicationIdInput.value = appId;
+        subtitle.innerHTML = `Candidate: <strong>${studentName}</strong> ${studentRoll ? '(' + studentRoll + ')' : ''} &bull; ${studentEmail}<br>Drive: <strong>${driveTitle}</strong>`;
+
+        // Check if candidate requested a reschedule
+        if (isRescheduleRequested && rescheduleBanner) {
+            rescheduleBanner.style.display = 'flex';
+            rescheduleReason.textContent = cleanAttrValue(btn.getAttribute('data-reschedule-reason')) || 'Candidate requested rescheduling.';
+            const reqTime = btn.getAttribute('data-reschedule-time');
+            rescheduleTime.textContent = reqTime ? `Requested at: ${reqTime}` : '';
+        } else if (rescheduleBanner) {
+            rescheduleBanner.style.display = 'none';
+        }
+
+        if (hasInterview) {
+            dateInput.value = btn.getAttribute('data-interview-date') || '';
+            timeInput.value = btn.getAttribute('data-interview-time') || '';
+            const existingMode = btn.getAttribute('data-interview-mode') || 'online';
+            switchInterviewMode(existingMode);
+            locAddressInput.value = cleanAttrValue(btn.getAttribute('data-interview-location')) || '';
+            meetLinkInput.value = cleanAttrValue(btn.getAttribute('data-interview-link')) || '';
+            descInput.value = cleanAttrValue(btn.getAttribute('data-interview-desc')) || '';
+            submitBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Update & Send Email Notification
+            `;
+        } else {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            dateInput.value = tomorrow.toISOString().split('T')[0];
+            timeInput.value = '10:00';
+            switchInterviewMode('online');
+            locAddressInput.value = '';
+            meetLinkInput.value = '';
+            descInput.value = 'Technical Interview Round. Please be ready 10 minutes early with an updated resume.';
+            submitBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Send Email & Schedule Interview
+            `;
+        }
+
+        modal.style.display = 'flex';
+        // Trigger reflow for CSS animation
+        void modal.offsetWidth;
+        modal.classList.add('modal-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeInterviewModal() {
+        modal.classList.remove('modal-active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 250);
+    }
+
+    document.querySelectorAll('.btn-schedule-interview').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            openInterviewModal(this);
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeInterviewModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeInterviewModal);
+
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            closeInterviewModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('modal-active')) {
+            closeInterviewModal();
+        }
+    });
+
+    // Form submit loading state
+    if (form) {
+        form.addEventListener('submit', function () {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.85"></path></svg>
+                Sending Email & Scheduling...
+            `;
+        });
+    }
+});
+</script>
 {% endblock %}
+

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from .models import StudentProfile, Application
+from .models import StudentProfile, Application, InterviewSchedule
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
@@ -108,3 +108,8 @@ class ApplicationAdmin(admin.ModelAdmin):
         updated = queryset.update(status='rejected')
         self.message_user(request, f"Successfully marked {updated} application(s) as Rejected.")
 
+@admin.register(InterviewSchedule)
+class InterviewScheduleAdmin(admin.ModelAdmin):
+    list_display = ('application', 'interview_date', 'interview_time', 'interview_mode', 'status', 'created_at')
+    list_filter = ('interview_mode', 'status', 'interview_date')
+    search_fields = ('application__student__full_name', 'application__student__roll_number', 'application__drive__title', 'meeting_link', 'location_address')

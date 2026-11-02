@@ -36,9 +36,9 @@ class StudentProfile(models.Model):
 class Application(models.Model):
     STATUS_CHOICES = [
         ('applied', 'Applied'),
-        ('shortlisted', 'Shortlisted'),
+        ('shortlisted', 'Shortlisted for Interview'),
         ('interview_scheduled', 'Interview Scheduled'),
-        ('selected', 'Selected'),
+        ('selected', 'Selected (Job Offer)'),
         ('rejected', 'Rejected'),
     ]
 
@@ -53,3 +53,36 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student.roll_number} - {self.drive.title} ({self.status})"
+
+class InterviewSchedule(models.Model):
+    MODE_CHOICES = [
+        ('online', 'Online'),
+        ('offline', 'Offline'),
+    ]
+
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='interview_schedules')
+    interview_date = models.DateField()
+    interview_time = models.TimeField()
+    interview_mode = models.CharField(max_length=20, choices=MODE_CHOICES, default='online')
+    location_address = models.TextField(blank=True, default='', help_text="Venue/Address for offline interview")
+    meeting_link = models.CharField(max_length=500, blank=True, default='', help_text="Meet/Zoom/Teams link for online interview")
+    description = models.TextField(blank=True, default='', help_text="Interview guidelines, agenda, or requirements")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    reschedule_requested = models.BooleanField(default=False)
+    reschedule_reason = models.TextField(blank=True, default='', help_text="Reason student requested reschedule (e.g. interview clash)")
+    reschedule_requested_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Interview: {self.application.student.full_name} - {self.application.drive.title} ({self.interview_date} {self.interview_time})"
+

@@ -5,12 +5,13 @@ from django.db.models import Count, Q
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
+from datetime import datetime, date, time
 
 from apps.accounts.models import User
 from .models import CompanyProfile
 from .forms import CompanyProfileForm, PlacementDriveForm
 from apps.common.models import PlacementDrive, Department, Skill
-from apps.student_portal.models import Application, StudentProfile
+from apps.student_portal.models import Application, StudentProfile, InterviewSchedule
 
 def company_required(view_func):
     """Decorator to restrict access only to Company accounts."""
@@ -34,21 +35,56 @@ def dashboard_view(request):
     total_drives_count = drives.count()
     published_drives_count = drives.filter(status='published').count()
     
-    applications = Application.objects.filter(drive__company=company_profile).select_related('student', 'drive')
+    applications = Application.objects.filter(drive__company=company_profile).select_related('student', 'student__department', 'drive')
     total_applications_count = applications.count()
+    applied_count = applications.filter(status='applied').count()
     shortlisted_count = applications.filter(status='shortlisted').count()
+    interview_scheduled_count = applications.filter(status='interview_scheduled').count()
     selected_count = applications.filter(status='selected').count()
-    
-    recent_applications = applications.order_by('-applied_at')[:5]
-    recent_drives = drives.order_by('-created_at')[:4]
-    
+    rejected_count = applications.filter(status='rejected').count()
+
+    # Active scheduled interviews for this company
+    raw_interviews = list(InterviewSchedule.objects.filter(
+        application__drive__company=company_profile,
+        status='scheduled'
+    ).select_related(
+        'application',
+        'application__student',
+        'application__student__department',
+        'application__student__user',
+        'application__drive'
+    ).order_by('interview_date', 'interview_time'))
+
+    seen_apps = set()
+    scheduled_interviews = []
+    for itw in raw_interviews:
+        if itw.application_id not in seen_apps:
+            seen_apps.add(itw.application_id)
+            scheduled_interviews.append(itw)
+
+    interviews_scheduled_count = len(scheduled_interviews)
+    reschedule_requested_count = sum(1 for itw in scheduled_interviews if itw.reschedule_requested)
+
+    recent_applications = applications.order_by('-applied_at')[:6]
+    recent_drives = PlacementDrive.objects.filter(
+        company=company_profile
+    ).annotate(
+        applicant_count=Count('application')
+    ).order_by('-created_at')[:5]
+
     context = {
         'company_profile': company_profile,
         'total_drives_count': total_drives_count,
         'published_drives_count': published_drives_count,
         'total_applications_count': total_applications_count,
+        'applied_count': applied_count,
         'shortlisted_count': shortlisted_count,
+        'interview_scheduled_count': interview_scheduled_count,
         'selected_count': selected_count,
+        'rejected_count': rejected_count,
+        'scheduled_interviews': scheduled_interviews,
+        'interviews_scheduled_count': interviews_scheduled_count,
+        'reschedule_requested_count': reschedule_requested_count,
         'recent_applications': recent_applications,
         'recent_drives': recent_drives,
     }
@@ -163,9 +199,11 @@ def drive_detail_view(request, pk):
     drive = get_object_or_404(PlacementDrive, pk=pk, company=company_profile)
     
     status_filter = request.GET.get('status', 'all')
-    applications = Application.objects.filter(drive=drive).select_related('student', 'student__department', 'student__user').order_by('-applied_at')
+    applications = Application.objects.filter(drive=drive).select_related(
+        'student', 'student__department', 'student__user'
+    ).prefetch_related('interview_schedules').order_by('-applied_at')
     
-    if status_filter != 'all':
+    if status_filter and status_filter != 'all':
         applications = applications.filter(status=status_filter)
         
     context = {
@@ -190,19 +228,20 @@ def applicants_list_view(request):
     
     applications = Application.objects.filter(drive__company=company_profile).select_related(
         'student', 'student__department', 'student__user', 'drive'
-    ).order_by('-applied_at')
+    ).prefetch_related('interview_schedules').order_by('-applied_at')
     
     if selected_drive_id and selected_drive_id.isdigit():
         applications = applications.filter(drive_id=int(selected_drive_id))
         
-    if status_filter != 'all':
+    if status_filter and status_filter != 'all':
         applications = applications.filter(status=status_filter)
         
     if search_query:
         applications = applications.filter(
             Q(student__full_name__icontains=search_query) |
             Q(student__roll_number__icontains=search_query) |
-            Q(student__user__email__icontains=search_query)
+            Q(student__user__email__icontains=search_query) |
+            Q(drive__title__icontains=search_query)
         )
         
     context = {
@@ -225,47 +264,132 @@ def update_application_status_view(request, pk):
         valid_statuses = [choice[0] for choice in Application.STATUS_CHOICES]
         
         if new_status in valid_statuses:
-            old_status = application.get_status_display()
             application.status = new_status
-            application.save()
-            
-            # Trigger notification email to student
-            try:
-                status_class_map = {
-                    'selected': 'selected',
-                    'shortlisted': 'shortlisted',
-                    'interview_scheduled': 'interview',
-                    'rejected': 'rejected',
-                }
-                status_class = status_class_map.get(new_status, 'shortlisted')
-                portal_url = request.build_absolute_uri('/student/applications/')
-                
-                html_message = render_to_string('emails/application_status_update.html', {
-                    'student_name': application.student.full_name,
-                    'company_name': company_profile.company_name,
-                    'drive_title': application.drive.title,
-                    'status_class': status_class,
-                    'status_display': application.get_status_display(),
-                    'portal_url': portal_url,
-                })
-                
-                send_mail(
-                    subject=f"Application Update: {application.drive.title} at {company_profile.company_name}",
-                    message=f"Hi {application.student.full_name},\nYour application status for {application.drive.title} has been updated to: {application.get_status_display()}.",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[application.student.user.email],
-                    html_message=html_message,
-                    fail_silently=True
-                )
-            except Exception as e:
-                print(f"Error sending application status update email: {e}")
-                
+            application.save() # Handled by student_portal signals.py to prevent duplicate emails
             messages.success(request, f"Application status updated for {application.student.full_name} to '{application.get_status_display()}'.")
         else:
             messages.error(request, "Invalid status choice.")
             
     next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or redirect('company_portal:applicants_list').url
     return redirect(next_url)
+
+
+@company_required
+def schedule_interview_view(request):
+    if request.method != 'POST':
+        return redirect('company_portal:applicants_list')
+        
+    company_profile, created = CompanyProfile.objects.get_or_create(user=request.user)
+    application_id = request.POST.get('application_id')
+    application = get_object_or_404(Application, pk=application_id, drive__company=company_profile)
+    
+    interview_date = request.POST.get('interview_date')
+    interview_time = request.POST.get('interview_time')
+    interview_mode = request.POST.get('interview_mode', 'online')
+    location_address = request.POST.get('location_address', '').strip()
+    meeting_link = request.POST.get('meeting_link', '').strip()
+    description = request.POST.get('description', '').strip()
+    
+    if not interview_date or not interview_time:
+        messages.error(request, "Please specify both interview date and time.")
+        next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or redirect('company_portal:applicants_list').url
+        return redirect(next_url)
+        
+    # Store or update interview schedule in database (delete any old meetings for this application so only 1 exists)
+    InterviewSchedule.objects.filter(application=application).delete()
+    interview = InterviewSchedule.objects.create(
+        application=application,
+        interview_date=interview_date,
+        interview_time=interview_time,
+        interview_mode=interview_mode,
+        location_address=location_address,
+        meeting_link=meeting_link,
+        description=description,
+        status='scheduled',
+        reschedule_requested=False,
+        reschedule_reason=''
+    )
+    
+    # Update application status to interview_scheduled (suppress generic status email, since detailed invitation email is sent below)
+    application.status = 'interview_scheduled'
+    application._skip_status_email = True
+    application.save()
+
+    
+    # Refresh to ensure DB model types
+    interview.refresh_from_db()
+
+    # Format human-readable date and time strings directly for guaranteed email rendering
+    try:
+        if isinstance(interview.interview_date, (datetime, date)):
+            formatted_date = interview.interview_date.strftime('%A, %B %d, %Y')
+        else:
+            formatted_date = datetime.strptime(str(interview.interview_date), '%Y-%m-%d').strftime('%A, %B %d, %Y')
+    except Exception:
+        formatted_date = str(interview.interview_date)
+
+    try:
+        if isinstance(interview.interview_time, (datetime, time)):
+            formatted_time = interview.interview_time.strftime('%I:%M %p')
+        else:
+            time_str = str(interview.interview_time).split('.')[0]
+            if len(time_str.split(':')) == 3:
+                formatted_time = datetime.strptime(time_str, '%H:%M:%S').strftime('%I:%M %p')
+            else:
+                formatted_time = datetime.strptime(time_str, '%H:%M').strftime('%I:%M %p')
+    except Exception:
+        formatted_time = str(interview.interview_time)
+
+    # Send interview invitation email to student candidate
+    email_sent = False
+    try:
+        html_message = render_to_string('emails/interview_schedule_notification.html', {
+            'student_name': application.student.full_name,
+            'company_name': company_profile.company_name,
+            'drive_title': application.drive.title,
+            'interview': interview,
+            'formatted_date': formatted_date,
+            'formatted_time': formatted_time,
+        })
+        
+        mode_text = "Online" if interview_mode == "online" else "In-Person (Offline)"
+        plain_message = (
+            f"Dear {application.student.full_name},\n\n"
+            f"An interview has been scheduled for your application to {application.drive.title} at {company_profile.company_name}.\n\n"
+            f"Date: {formatted_date}\n"
+            f"Time: {formatted_time}\n"
+            f"Mode: {mode_text}\n"
+        )
+        if interview_mode == 'offline':
+            plain_message += f"Venue / Address: {location_address}\n"
+        else:
+            if meeting_link:
+                plain_message += f"Meeting Link: {meeting_link}\n"
+        if description:
+            plain_message += f"\nDescription / Instructions: {description}\n"
+        plain_message += f"\nBest regards,\n{company_profile.company_name}"
+        
+        send_mail(
+            subject=f"Interview Scheduled: {application.drive.title} at {company_profile.company_name}",
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[application.student.user.email],
+            html_message=html_message,
+            fail_silently=False
+        )
+        email_sent = True
+    except Exception as e:
+        print(f"Error sending interview schedule email: {e}")
+        email_sent = False
+        
+    if email_sent:
+        messages.success(request, f"Interview scheduled for {application.student.full_name} and invitation email sent to {application.student.user.email}!")
+    else:
+        messages.success(request, f"Interview scheduled for {application.student.full_name} and recorded in database.")
+        
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or redirect('company_portal:applicants_list').url
+    return redirect(next_url)
+
 
 
 import json

@@ -203,8 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Prevent form submission if email is not verified
+    // 3. Prevent form submission if email is not verified, and prevent double submission
     if (form) {
+        let isSubmitting = false;
         form.addEventListener('submit', (e) => {
             if (!isEmailVerified) {
                 e.preventDefault();
@@ -212,9 +213,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (otpSection.style.display === 'block') {
                     if (otpInput) otpInput.focus();
                 } else {
-                    sendOtpBtn.click();
+                    if (sendOtpBtn && !sendOtpBtn.disabled) {
+                        sendOtpBtn.click();
+                    }
                 }
+                return;
+            }
+
+            if (isSubmitting) {
+                e.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Registering account...';
             }
         });
     }
 });
+

@@ -10,6 +10,18 @@
     </div>
 </div>
 
+{% if clash_detected %}
+<div class="interview-clash-alert">
+    <div class="clash-alert-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+    </div>
+    <div class="clash-alert-content">
+        <h4 class="clash-alert-title">Schedule Conflict / Interview Clash Detected!</h4>
+        <p class="clash-alert-text">You have multiple interviews scheduled on the same date with overlapping times. Please click <strong>"Request Reschedule"</strong> on conflicting interviews to notify the recruiter.</p>
+    </div>
+</div>
+{% endif %}
+
 <div class="applications-list-container">
     {% for app in applications %}
     <div class="card app-card-interactive">
@@ -41,15 +53,15 @@
                     </span>
                 {% elif app.status == 'shortlisted' %}
                     <span class="status-pill shortlisted">
-                        <span class="status-pill-dot"></span> Shortlisted
+                        <span class="status-pill-dot"></span> Shortlisted for Interview
                     </span>
                 {% elif app.status == 'interview_scheduled' %}
                     <span class="status-pill interview">
-                        <span class="status-pill-dot"></span> Interview
+                        <span class="status-pill-dot"></span> Interview Scheduled
                     </span>
                 {% elif app.status == 'selected' %}
                     <span class="status-pill selected">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Selected
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Selected (Job Offer)
                     </span>
                 {% elif app.status == 'rejected' %}
                     <span class="status-pill rejected">
@@ -64,6 +76,81 @@
                 <a href="{% url 'student_portal:drive_detail' app.drive.id %}" class="btn btn-secondary btn-sm-padding">View Drive Details</a>
             </div>
         </div>
+
+        {% with latest_interview=app.interview_schedules.first %}
+        {% if latest_interview %}
+        <div class="app-interview-card-compact">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="font-weight: 700; font-size: 0.9rem; color: var(--color-text-primary); display: flex; align-items: center; gap: 0.4rem;">
+                    <span>📅 Interview Scheduled:</span>
+                    <span style="color: #3b82f6;">{{ latest_interview.interview_date|date:"l, d M Y" }} at {{ latest_interview.interview_time|time:"h:i A" }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    {% if latest_interview.has_clash %}
+                        <span class="badge-time-clash" title="Clashes with another interview scheduled around the same time!">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            Time Clash
+                        </span>
+                    {% endif %}
+                    <span class="interview-mode-badge {% if latest_interview.interview_mode == 'online' %}interview-mode-online{% else %}interview-mode-offline{% endif %}">
+                        {{ latest_interview.get_interview_mode_display }}
+                    </span>
+                </div>
+            </div>
+
+            {% if latest_interview.interview_mode == 'offline' %}
+                <div style="font-size: 0.85rem; color: var(--color-text-secondary); margin-top: 0.25rem;">
+                    <strong>📍 Venue Address:</strong> {{ latest_interview.location_address }}
+                </div>
+            {% endif %}
+
+            {% if latest_interview.description %}
+            <div style="font-size: 0.82rem; color: var(--color-text-secondary); margin-top: 0.3rem;">
+                <strong>Instructions:</strong> {{ latest_interview.description }}
+            </div>
+            {% endif %}
+
+            <!-- Bottom Actions: Join Link & Request Reschedule -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--color-border);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    {% if latest_interview.interview_mode == 'online' and latest_interview.meeting_link %}
+                    <a href="{{ latest_interview.meeting_link }}" target="_blank" class="btn-join-meeting" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                        Join Meeting
+                    </a>
+                    <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Link: <a href="{{ latest_interview.meeting_link }}" target="_blank" style="color: var(--color-primary); word-break: break-all;">{{ latest_interview.meeting_link }}</a></span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    {% if latest_interview.reschedule_requested %}
+                        <div class="interview-reschedule-status-box" style="padding: 0.35rem 0.6rem;" title="Requested on {{ latest_interview.reschedule_requested_at|date:'M d, Y h:i A' }}">
+                            <span class="badge-reschedule-pending" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                Reschedule Requested
+                            </span>
+                        </div>
+                    {% else %}
+                        <button type="button"
+                                class="btn-request-reschedule {% if latest_interview.has_clash %}has-clash-btn{% endif %}"
+                                style="padding: 0.35rem 0.75rem; font-size: 0.78rem;"
+                                data-interview-id="{{ latest_interview.id }}"
+                                data-company-name="{{ app.drive.company.company_name }}"
+                                data-drive-title="{{ app.drive.title }}"
+                                data-interview-date="{{ latest_interview.interview_date|date:'l, d F Y' }}"
+                                data-interview-time="{{ latest_interview.interview_time|time:'h:i A' }}"
+                                data-interview-mode="{{ latest_interview.get_interview_mode_display }}"
+                                data-has-clash="{% if latest_interview.has_clash %}true{% else %}false{% endif %}"
+                                title="Request company recruiter to reschedule this interview">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            <span>Request Reschedule</span>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
     </div>
     {% empty %}
     <div class="empty-state-box">
@@ -76,4 +163,6 @@
     </div>
     {% endfor %}
 </div>
+
+{% include 'student_portal/includes/reschedule_modal.html' %}
 {% endblock %}

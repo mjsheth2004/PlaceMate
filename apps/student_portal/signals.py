@@ -20,6 +20,10 @@ def track_previous_status(sender, instance, **kwargs):
 @receiver(post_save, sender=Application)
 def send_application_status_update_email(sender, instance, created, **kwargs):
     """Send email notification to student when application status is updated."""
+    # Skip if explicitly suppressed (e.g. detailed interview invitation is being sent instead)
+    if getattr(instance, '_skip_status_email', False):
+        return
+
     old_status = getattr(instance, '_old_status', None)
     current_status = instance.status
 
@@ -29,9 +33,9 @@ def send_application_status_update_email(sender, instance, created, **kwargs):
         drive = instance.drive
         
         status_labels = {
-            'shortlisted': 'Shortlisted',
+            'shortlisted': 'Shortlisted for Interview',
             'interview_scheduled': 'Interview Scheduled',
-            'selected': 'Selected (Offer Extended)',
+            'selected': 'Selected (Job Offer)',
             'rejected': 'Update on Application'
         }
         
